@@ -52,19 +52,19 @@ export default function UploadInfo() {
       await new Promise(resolve => setTimeout(resolve, 20000));
 
       // Simulated API call
-      // const response = await fetch("http://localhost:8000/api/analyze", {
-      //   method: "POST",
-      //   body: formData,
-      // });
+      const response = await fetch("http://localhost:8000/api/analyze", {
+        method: "POST",
+        body: formData,
+      });
 
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   throw new Error(errorData.detail || "Failed to analyze the uploaded bill.");
-      // }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to analyze the uploaded bill.");
+      }
 
-      // const result = await response.json();
-      // setAnalysisResult(result);
-      // router.push("/results");
+      const result = await response.json();
+      setAnalysisResult(result);
+      router.push("/results");
     } catch (error) {
       console.error("Error during upload:", error);
       setError(error instanceof Error ? error.message : "Something went wrong. Please try again.");

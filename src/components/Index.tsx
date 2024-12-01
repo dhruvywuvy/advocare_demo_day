@@ -2,7 +2,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";  // Import from next/navigation
 
-function GetStarted() {
+function Index() {
   const router = useRouter();  // Use Next.js router instead of navigate
 
   return (
@@ -35,4 +35,4 @@ function GetStarted() {
   );
 }
 
-export default GetStarted;
+export default Index;
