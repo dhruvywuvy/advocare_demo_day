@@ -235,3 +235,15 @@ button.cta:hover {
 #analysis-result-box button:hover {
   background-color: #1d7d7a;
 }
+
+.white-text {
+  color: white;
+}
+
+.black-bg {
+  background-color: black;
+}
+
+.dark-green-text {
+  color: #2a555e;
+}
