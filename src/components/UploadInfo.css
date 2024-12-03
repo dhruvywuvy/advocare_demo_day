@@ -14,3 +14,14 @@
   opacity: 0;
   pointer-events: none;
 }
+
+.form-checkbox {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: left;
+  align-items: baseline;
+}
+
+.form-checkbox input {
+  margin: 1rem;
+}
