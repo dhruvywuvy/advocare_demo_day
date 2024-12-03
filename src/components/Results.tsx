@@ -37,6 +37,7 @@ interface AnalysisResult {
 function Results() {
   const router = useRouter(); // Replace useNavigate
   const { analysisResult } = useAnalysis();
+  console.log('Analysis Result:', analysisResult);
 
   const renderMiniBox = (title: string, content: string | number | boolean) => (
     <div key={title} className="bg-gray-100 p-4 rounded mb-4 shadow">
@@ -80,10 +81,10 @@ function Results() {
                 <h3 className="text-xl font-semibold mb-2">
                   Charges Compared to Standardized Rates
                 </h3>
-                {analysisResult.analysis.details.ucr_validation && (
+                {analysisResult.analysis.ucr_validation && (
                   <div>
-                    {analysisResult.analysis.details.ucr_validation.procedure_analysis.map(
-                      (procedure, index) => (
+                    {analysisResult.analysis.ucr_validation.procedure_analysis.map(
+                      (procedure:Procedure, index:number) => (
                         <div key={index} className="mb-4">
                           <h4 className="font-medium">Procedure {index + 1}</h4>
                           {renderMiniBox("Item", procedure.description)}
@@ -109,19 +110,19 @@ function Results() {
                     <h4 className="font-medium mt-4">Overall Assessment</h4>
                     {renderMiniBox(
                       "Assessment",
-                      analysisResult.analysis.details.ucr_validation
+                      analysisResult.analysis.ucr_validation
                         .overall_assessment
                     )}
 
                     <h4 className="font-medium mt-4">Recommendations</h4>
-                    {analysisResult.analysis.details.ucr_validation.recommendations.map(
-                      (recommendation, index) =>
+                    {analysisResult.analysis.ucr_validation.recommendations.map(
+                      (recommendation:string, index:number) =>
                         renderMiniBox(`Recommendation ${index + 1}`, recommendation)
                     )}
 
                     <h4 className="font-medium mt-4">References</h4>
-                    {analysisResult.analysis.details.ucr_validation.references.map(
-                      (reference, index) =>
+                    {analysisResult.analysis.ucr_validation.references.map(
+                      (reference:string, index:number) =>
                         renderMiniBox(`Reference ${index + 1}`, reference)
                     )}
                   </div>
@@ -133,20 +134,20 @@ function Results() {
                 <h3 className="text-xl font-semibold mb-2">
                   Potential Fraud Indicators
                 </h3>
-                {analysisResult.analysis.details.fraud_detection && (
+                {analysisResult.analysis.fraud_detection && (
                   <div>
                     <p>
                       <strong>Potential Fraud Detected:</strong>{" "}
-                      {analysisResult.analysis.details.fraud_detection.potential_fraud
+                      {analysisResult.analysis.fraud_detection.potential_fraud
                         ? "Yes"
                         : "No"}
                     </p>
-                    {analysisResult.analysis.details.fraud_detection
+                    {analysisResult.analysis.fraud_detection.details
                       .potential_fraud && (
                       <>
                         <h4 className="font-medium mt-2">Details:</h4>
-                        {analysisResult.analysis.details.fraud_detection.details?.map(
-                          (detail, index) =>
+                        {analysisResult.analysis.fraud_detection.details?.map(
+                          (detail:string, index:number) =>
                             renderMiniBox(`Fraud Indicator ${index + 1}`, detail)
                         )}
                       </>
