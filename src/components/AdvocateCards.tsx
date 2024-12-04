@@ -5,11 +5,22 @@ import { Button } from '../components/ui/button';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+interface Advocate {
+  id: number;
+  name: string;
+  title: string;
+  rating: number;
+  image: string;
+  experience: string;
+  details: string[];
+  expertise: string[];
+}
+
 const AdvocateCards = () => {
-  const [selectedAdvocate, setSelectedAdvocate] = useState(null);
+  const [selectedAdvocate, setSelectedAdvocate] = useState<Advocate | null>(null);
 
   const router = useRouter();  
-  const advocates = [
+  const advocates: Advocate[] = [
     {
       id: 1,
       name: "Io Dolka",
@@ -42,7 +53,7 @@ const AdvocateCards = () => {
     }
   ];
 
-  const renderStars = (rating) => {
+  const renderStars = (rating: number) => {
     return Array(5).fill(0).map((_, i) => (
       <span key={i} className={`text-yellow-400 ${i < Math.floor(rating) ? 'opacity-100' : 'opacity-30'}`}>
         ★
