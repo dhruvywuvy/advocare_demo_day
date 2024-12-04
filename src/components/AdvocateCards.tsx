@@ -14,19 +14,20 @@ interface Advocate {
   experience: string;
   details: string[];
   expertise: string[];
+  isBestMatch?: boolean;
 }
 
 const AdvocateCards = () => {
   const [selectedAdvocate, setSelectedAdvocate] = useState<Advocate | null>(null);
+  const router = useRouter();
 
-  const router = useRouter();  
   const advocates: Advocate[] = [
     {
       id: 1,
       name: "Io Dolka",
       title: "RN",
       rating: 4.5,
-      image: "/profile_pictures/iodolka.jpg", 
+      image: "/profile_pictures/iodolka.jpg",
       experience: "10 years of experience in pediatric nursing at Mayo Clinic",
       details: [
         "Specializes in medical bill review and negotiation",
@@ -34,14 +35,15 @@ const AdvocateCards = () => {
         "Expert in identifying billing errors and overcharges",
         "Deep understanding of insurance claims and appeals processes"
       ],
-      expertise: ["Medical Bill Review", "Insurance Appeals", "Patient Advocacy"]
+      expertise: ["Medical Bill Review", "Insurance Appeals", "Patient Advocacy"],
+      isBestMatch: true
     },
     {
       id: 2,
       name: "Cindy Johnson",
       title: "MSN",
       rating: 5.0,
-      image: "/profile_pictures/cindyjohnson.jpg", 
+      image: "/profile_pictures/cindyjohnson.jpg",
       experience: "Lead nurse educator at Cleveland Clinic for 5 years",
       details: [
         "Specialized in complex medical billing disputes",
@@ -49,7 +51,8 @@ const AdvocateCards = () => {
         "Expert in healthcare pricing transparency",
         "Strong track record in negotiating with insurance companies"
       ],
-      expertise: ["Billing Disputes", "Insurance Negotiation", "Healthcare Policy"]
+      expertise: ["Billing Disputes", "Insurance Negotiation", "Healthcare Policy"],
+      isBestMatch: false
     }
   ];
 
@@ -67,14 +70,21 @@ const AdvocateCards = () => {
         {advocates.map((advocate) => (
           <Card 
             key={advocate.id}
-            className={`cursor-pointer transition-all hover:shadow-lg ${
-              selectedAdvocate?.id === advocate.id ? 'ring-2 ring-teal-500' : ''
-            }`}
+            className={`cursor-pointer transition-all hover:shadow-lg relative
+              ${selectedAdvocate?.id === advocate.id ? 'ring-2 ring-teal-500' : ''}
+              ${advocate.isBestMatch ? 'ring-2 ring-teal-500 animate-pulse-border' : ''}
+            `}
             onClick={() => setSelectedAdvocate(advocate)}
           >
+            {advocate.isBestMatch && (
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-4 py-1 rounded-full text-sm font-medium z-10">
+                Best Match for Your Case
+              </div>
+            )}
             <div className="p-6">
               <div className="flex items-center space-x-4">
-              <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                <div className={`relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0 
+                  ${advocate.isBestMatch ? 'ring-4 ring-teal-500 ring-opacity-50' : ''}`}>
                   <Image
                     src={advocate.image}
                     alt={`${advocate.name}'s profile picture`}
@@ -127,12 +137,12 @@ const AdvocateCards = () => {
             </div>
 
             <Button 
-    className="w-full md:w-auto bg-teal-500 hover:bg-teal-600 text-white"
-    onClick={() => {
-      console.log(`Working with ${selectedAdvocate.name}`);
-      router.push('/dashboard');
-    }}
-  >
+              className="w-full md:w-auto bg-teal-500 hover:bg-teal-600 text-white"
+              onClick={() => {
+                console.log(`Working with ${selectedAdvocate.name}`);
+                router.push('/dashboard');
+              }}
+            >
               Work with {selectedAdvocate.name}
             </Button>
           </div>
