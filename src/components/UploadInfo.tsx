@@ -64,7 +64,7 @@ export default function UploadInfo() {
 
     try {
       // Simulate delay to see state change
-      await new Promise(resolve => setTimeout(resolve, 20000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Simulated API call
       const response = await fetch("http://localhost:8000/api/analyze", {
