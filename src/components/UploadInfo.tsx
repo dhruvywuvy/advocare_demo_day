@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAnalysis } from "../lib/context/AnalysisContext";
 import "./UploadInfo.css"
+import AboutUs from './AboutUs';
 
 export default function UploadInfo() {
   const [loading, setLoading] = useState(false);
@@ -135,72 +136,14 @@ export default function UploadInfo() {
             />
           </div>
           <div>
-            <p className="font-bold">
-              Do You See Any Potential Errors Or Wrongful Charges?
-            </p>
-            <p className="text-sm">
-              (Check all that apply or leave a textbox for custom input)
-            </p>
-            <div className="text-[0.8rem]">
-              <div className="form-checkbox">
-                <label>
-                  Duplicate Charges
-                </label>
-                <input
-                  type="checkbox"
-                  value="duplicate charges"
-                />
-              </div>
-              <div className="form-checkbox">
-                <label>
-                  Services Not Recieved
-                </label>
-                <input
-                  type="checkbox"
-                  name="Services Not Recieved"
-                  value="services not recieved"
-                />
-              </div>
-              <div className="form-checkbox">
-                <label>
-                  Unexpected Fees
-                </label>
-                <input
-                  type="checkbox"
-                  name="Unexpected Fees"
-                  value="unexpected fees"
-                />
-              </div>
-              <div className="form-checkbox">
-                <label>
-                  Unclear or Unitemized Charges
-                </label>
-                <input
-                  type="checkbox"
-                  name="Unclear or Unitemized Charges"
-                  value="unclear or unitemized charges"
-                />
-              </div>
-              <div className="form-checkbox">
-                <label>
-                  Other
-                </label>
-                <input
-                  className="other-checkbox"
-                  type="checkbox"
-                  name="Other"
-                  value="other"
-                  onChange={handleCheckboxChange}
-                />
-              </div>
-              <div className="w-[90%] ml-auto mr-auto">
-              {otherChecked ? (
-                <input type="text"/>
-              ) :
-                (null)
-              }
-              </div>
-            </div>
+            <label>
+              Are there any charges on your bill that did not happen?
+            </label>
+            <input
+              type="text"
+              name="wrong-charges"
+              id="wrong-charges"
+            />
           </div>
           <div className="flex items-baseline">
             <label className="mr-[1rem]">Do You Have Insurance?</label>
