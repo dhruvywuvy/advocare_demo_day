@@ -170,7 +170,6 @@ form {
 label {
   display: block;
   font-weight: bold;
-  margin-bottom: 0.5rem;
   color: #008080;
 }
 
@@ -213,12 +212,12 @@ button.cta:hover {
 #analysis-result-box h3 {
   font-size: 1.5rem;
   font-weight: bold;
-  margin-bottom: 1rem;
+
 }
 
 #analysis-result-box p {
   font-size: 1.25rem;
-  margin-bottom: 1rem;
+
 }
 
 #analysis-result-box button {

@@ -31,13 +31,13 @@ const CaseDashboard = () => {
     {
       title: "Authorize Advocare",
       description: "You authorized Advocare to speak with the hospital.",
-      completed: true,
+      completed: false,
       required: true,
     },
     {
       title: "Get your billing records",
       description: "You authorized us to get your records from the hospital.",
-      completed: true,
+      completed: false,
       required: true,
     },
     {
@@ -55,15 +55,15 @@ const CaseDashboard = () => {
           <Link href="/bills" className="hover:underline">
             Bills
           </Link>{" "}
-          / <span>$5,000.00 - Providence Newberg Medical Center</span>
+          / <span>$5,000.00 - LA General Medicine</span>
         </div>
 
         <div className="bg-gray-50 rounded-lg p-6">
           <h2 className="text-lg font-medium mb-1">Your emergency room bill</h2>
-          <div className="text-gray-600">OCTOBER 4, 2024</div>
-          <div className="text-gray-600">Providence Newberg Medical Center</div>
+          <div className="text-gray-600">December 1, 2024</div>
+          <div className="text-gray-600">LA General Medicine</div>
           <div className="text-gray-500">1001 Providence Drive</div>
-          <div className="text-gray-500">Newberg, OR 97132</div>
+          <div className="text-gray-500">Los Angeles, CA 90007</div>
 
           <div className="mt-4">
             <div className="text-lg font-bold">YOUR BALANCE</div>
@@ -139,7 +139,7 @@ const CaseDashboard = () => {
 
       {/* need help? section */}
       <div className="bg-gray-50 rounded-lg p-6">
-        <h3 className="text-lg font-medium mb-4">Need help?</h3>
+        <h3 className="text-lg font-medium mb-4">Pending Advocate Review</h3>
         <div className="flex items-center mb-4">
           <div className="relative w-12 h-12 rounded-full overflow-hidden">
             <Image
@@ -155,7 +155,7 @@ const CaseDashboard = () => {
               Email Io Dolka <ChevronRight className="inline w-4 h-4" />
             </Link>
             <div className="text-sm text-gray-500">
-              Your Professional Advocate
+              Your Potential Professional Advocate
             </div>
           </div>
         </div>

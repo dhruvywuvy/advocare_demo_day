@@ -9,7 +9,7 @@ export default function ResultsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white py-8">
       <Results />
-      <div className="flex justify-center mt-8 mb-16">
+      <div className="flex justify-center">
         <button
           onClick={() => router.push('/advocates')}
           className="bg-teal-500 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-colors"

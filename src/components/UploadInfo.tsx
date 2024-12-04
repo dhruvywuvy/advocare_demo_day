@@ -4,6 +4,48 @@ import { useRouter } from "next/navigation";
 import { useAnalysis } from "../lib/context/AnalysisContext";
 import "./UploadInfo.css"
 
+// Demo data that matches the results page
+const DEMO_RESULT = {
+  analysis: {
+    summary: "Significant overcharging detected for both procedures, with invalid code usage (B002) and charges exceeding UCR rates by substantial margins",
+    recommendations: "Contact provider to dispute charges and request itemized bill",
+    details: {
+      ucr_validation: {
+        procedure_analysis: [
+          {
+            description: "Cell enumeration & id",
+            billed_cost: 300,
+            ucr_rate: 150,
+            difference: 150,
+            percentage_difference: 100,
+            is_reasonable: false,
+            comments: "Billed amount significantly higher than estimated UCR rate"
+          },
+          {
+            description: "X-ray",
+            billed_cost: 450,
+            ucr_rate: 87.50,
+            difference: 362.50,
+            percentage_difference: 514,
+            is_reasonable: false,
+            comments: "Billed amount exceeds UCR rate by over 500%"
+          }
+        ],
+        overall_assessment: "Multiple procedures show significant overcharging patterns",
+        recommendations: [
+          "Contest the X-ray charge as it exceeds normal rates by over 500%",
+          "Request detailed itemization for cell enumeration procedure",
+          "Consider filing a complaint with insurance provider"
+        ],
+        references: [
+          "Medicare Fee Schedule 2024",
+          "Regional UCR Database Q1 2024"
+        ]
+      }
+    }
+  }
+};
+
 export default function UploadInfo() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +81,6 @@ export default function UploadInfo() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = new FormData();
     const fileInput = document.getElementById("bill-input") as HTMLInputElement;
     const files = fileInput.files;
 
@@ -53,36 +94,19 @@ export default function UploadInfo() {
       return;
     }
 
-    Array.from(files).forEach((file) => formData.append("files", file));
-
-    formData.append("firstName", (document.getElementById("first-name") as HTMLInputElement).value);
-    formData.append("lastName", (document.getElementById("last-name") as HTMLInputElement).value);
-    formData.append("dateOfBirth", (document.getElementById("date-of-birth") as HTMLInputElement).value);
-
     setLoading(true);
     setError(null);
 
     try {
-      // Simulate delay to see state change
+      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Simulated API call
-      const response = await fetch("http://localhost:8000/api/analyze", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to analyze the uploaded bill.");
-      }
-
-      const result = await response.json();
-      setAnalysisResult(result);
+      
+      // Set demo result and redirect
+      setAnalysisResult(DEMO_RESULT);
       router.push("/results");
     } catch (error) {
-      console.error("Error during upload:", error);
-      setError(error instanceof Error ? error.message : "Something went wrong. Please try again.");
+      console.error("Error:", error);
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -4,49 +4,64 @@ import { useRouter } from "next/navigation";
 import { useAnalysis } from "../lib/context/AnalysisContext";
 import { BeatLoader } from 'react-spinners';
 
-interface Procedure {
-  description: string;
-  billed_cost: number;
-  ucr_rate: number;
-  difference: number;
-  percentage_difference: number;
-  is_reasonable: boolean;
-  comments: string;
-}
-
-interface AnalysisResult {
+// Demo data stays the same...
+const DEMO_DATA = {
   analysis: {
-    summary: string;
-    recommendations: string;
+    summary: "Significant overcharging detected for both procedures, with invalid code usage (B002) and charges exceeding UCR rates by substantial margins",
+    recommendations: "Contact provider to dispute charges and request itemized bill",
     details: {
       ucr_validation: {
-        procedure_analysis: Procedure[];
-        overall_assessment: string;
-        recommendations: string[];
-        references: string[];
-      };
-      fraud_detection: {
-        potential_fraud: boolean;
-        details?: string[];
-      };
-    };
-  };
-}
+        procedure_analysis: [
+          {
+            description: "Cell enumeration & id",
+            billed_cost: 300,
+            ucr_rate: 150,
+            difference: 150,
+            percentage_difference: 100,
+            is_reasonable: false,
+            comments: "Billed amount significantly higher than estimated UCR rate"
+          },
+          {
+            description: "X-ray",
+            billed_cost: 450,
+            ucr_rate: 87.50,
+            difference: 362.50,
+            percentage_difference: 514,
+            is_reasonable: false,
+            comments: "Billed amount exceeds UCR rate by over 500%"
+          }
+        ],
+        overall_assessment: "Multiple procedures show significant overcharging patterns",
+        recommendations: [
+          "Contest the X-ray charge as it exceeds normal rates by over 500%",
+          "Request detailed itemization for cell enumeration procedure",
+          "Consider filing a complaint with insurance provider"
+        ],
+        references: [
+          "Medicare Fee Schedule 2024",
+          "Regional UCR Database Q1 2024"
+        ]
+      }
+    }
+  }
+};
 
 function Results() {
   const router = useRouter();
-  const { analysisResult } = useAnalysis();
+  const analysisResult = DEMO_DATA;
 
-  const renderMiniBox = (title: string, content: string | number | boolean) => (
-    <div key={title} className="bg-gray-100 p-4 rounded mb-4 shadow">
-      <h4 className="font-medium">{title}</h4>
-      <p>{content.toString()}</p>
-    </div>
-  );
+  const formatCurrency = (value: number | null | undefined) => {
+    if (value == null) return '-';
+    return `$${value.toLocaleString()}`;
+  };
+
+  const procedures = analysisResult?.analysis?.details?.ucr_validation?.procedure_analysis || [];
+  const recommendations = analysisResult?.analysis?.details?.ucr_validation?.recommendations || [];
+  const references = analysisResult?.analysis?.details?.ucr_validation?.references || [];
 
   if (!analysisResult) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-teal-50 to-white py-8">
+      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-teal-50 to-white">
         <p className="text-xl mb-4">No analysis results available.</p>
         <button
           onClick={() => router.push("/")}
@@ -59,103 +74,70 @@ function Results() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white py-8">
-      <div className="container mx-auto px-4">
+    <div className="bg-gradient-to-b from-teal-50 to-white py-6 flex justify-center">
+      <div className="max-w-4xl w-full px-4">
         <div className="bg-white p-6 rounded shadow-md">
           <h2 className="text-2xl font-bold mb-4">Analysis Result</h2>
 
           {/* Summary Section */}
-          <section className="mb-6">
+          <section className="mb-4">
             <h3 className="text-xl font-semibold mb-2">Summary</h3>
-            {analysisResult.analysis.summary &&
-              renderMiniBox("Overview", analysisResult.analysis.summary)}
+            <div className="bg-gray-100 p-4 rounded">
+              <p>{analysisResult?.analysis?.summary}</p>
+            </div>
           </section>
 
           {/* UCR Validation Section */}
-          <section className="mb-6">
-            <h3 className="text-xl font-semibold mb-2">
-              Charges Compared to Standardized Rates
-            </h3>
-            {analysisResult.analysis.details.ucr_validation && (
-              <div>
-                {analysisResult.analysis.details.ucr_validation.procedure_analysis.map(
-                  (procedure, index) => (
-                    <div key={index} className="mb-4">
-                      <h4 className="font-medium">Procedure {index + 1}</h4>
-                      {renderMiniBox("Item", procedure.description)}
-                      {renderMiniBox(
-                        "You were Billed",
-                        `$${procedure.billed_cost}`
-                      )}
-                      {renderMiniBox("Standard Rate", `$${procedure.ucr_rate}`)}
-                      {renderMiniBox("Difference", `$${procedure.difference}`)}
-                      {renderMiniBox(
-                        "Percentage Difference",
-                        `${procedure.percentage_difference}%`
-                      )}
-                      {renderMiniBox(
-                        "Is Reasonable",
-                        procedure.is_reasonable ? "Yes" : "No"
-                      )}
-                      {renderMiniBox("Comments", procedure.comments)}
-                    </div>
-                  )
-                )}
+          <section className="mb-4">
+            <h3 className="text-xl font-semibold mb-2">Charges Compared to Standardized Rates</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-200">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="px-4 py-2 border">Procedure</th>
+                    <th className="px-4 py-2 border">Description</th>
+                    <th className="px-4 py-2 border">Billed Cost</th>
+                    <th className="px-4 py-2 border">Standard Rate</th>
+                    <th className="px-4 py-2 border">Difference</th>
+                    <th className="px-4 py-2 border">Comments</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {procedures.map((procedure, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 border">{index + 1}</td>
+                      <td className="px-4 py-2 border">{procedure?.description || '-'}</td>
+                      <td className="px-4 py-2 border text-right">{formatCurrency(procedure?.billed_cost)}</td>
+                      <td className="px-4 py-2 border text-right">{formatCurrency(procedure?.ucr_rate)}</td>
+                      <td className="px-4 py-2 border text-right">{formatCurrency(procedure?.difference)}</td>
+                      <td className="px-4 py-2 border">{procedure?.comments || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-                <h4 className="font-medium mt-4">Overall Assessment</h4>
-                {renderMiniBox(
-                  "Assessment",
-                  analysisResult.analysis.details.ucr_validation
-                    .overall_assessment
-                )}
-
-                <h4 className="font-medium mt-4">Recommendations</h4>
-                {analysisResult.analysis.details.ucr_validation.recommendations.map(
-                  (recommendation, index) =>
-                    renderMiniBox(`Recommendation ${index + 1}`, recommendation)
-                )}
-
-                <h4 className="font-medium mt-4">References</h4>
-                {analysisResult.analysis.details.ucr_validation.references.map(
-                  (reference, index) =>
-                    renderMiniBox(`Reference ${index + 1}`, reference)
-                )}
+            {recommendations.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-medium mb-2">Recommendations</h4>
+                <ul className="list-disc pl-5">
+                  {recommendations.map((recommendation, index) => (
+                    <li key={index} className="mb-1">{recommendation}</li>
+                  ))}
+                </ul>
               </div>
             )}
-          </section>
 
-          {/* Fraud Detection Section */}
-          <section className="mb-6">
-            <h3 className="text-xl font-semibold mb-2">
-              Potential Fraud Indicators
-            </h3>
-            {analysisResult.analysis.details.fraud_detection && (
-              <div>
-                <p>
-                  <strong>Potential Fraud Detected:</strong>{" "}
-                  {analysisResult.analysis.details.fraud_detection.potential_fraud
-                    ? "Yes"
-                    : "No"}
-                </p>
-                {analysisResult.analysis.details.fraud_detection
-                  .potential_fraud && (
-                  <>
-                    <h4 className="font-medium mt-2">Details:</h4>
-                    {analysisResult.analysis.details.fraud_detection.details?.map(
-                      (detail, index) =>
-                        renderMiniBox(`Fraud Indicator ${index + 1}`, detail)
-                    )}
-                  </>
-                )}
+            {references.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-medium mb-2">References</h4>
+                <ul className="list-disc pl-5">
+                  {references.map((reference, index) => (
+                    <li key={index} className="mb-1">{reference}</li>
+                  ))}
+                </ul>
               </div>
             )}
-          </section>
-
-          {/* Recommendations Section */}
-          <section className="mb-6">
-            <h3 className="text-xl font-semibold mb-2">Summary</h3>
-            {analysisResult.analysis.recommendations &&
-              renderMiniBox("Overview", analysisResult.analysis.recommendations)}
           </section>
         </div>
       </div>
