@@ -12,7 +12,7 @@ export default function ResultsPage() {
       <div className="flex justify-center">
         <button
           onClick={() => router.push('/advocates')}
-          className="bg-teal-500 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-colors"
+          className="mb-20 bg-teal-500 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-colors"
         >
           Connect with an Advocate
         </button>

@@ -30,13 +30,13 @@ const CaseDashboard = () => {
     },
     {
       title: "Authorize Advocare",
-      description: "You authorized Advocare to speak with the hospital.",
+      description: "You must authorize Advocare to speak with the hospital.",
       completed: false,
       required: true,
     },
     {
       title: "Get your billing records",
-      description: "You authorized us to get your records from the hospital.",
+      description: "You must authorize us to get your records from the hospital.",
       completed: false,
       required: true,
     },
@@ -73,10 +73,6 @@ const CaseDashboard = () => {
             </div>
           </div>
 
-          <div className="mt-4 bg-green-100 text-green-800 px-3 py-2 rounded-md text-sm inline-flex items-center">
-            <CheckCircle className="w-4 h-4 mr-2" />
-            Est. no collections risk as of Feb. 1. Verify →
-          </div>
         </div>
       </div>
 
@@ -106,7 +102,7 @@ const CaseDashboard = () => {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Tasks</h3>
-          <span className="text-sm text-gray-500">2 of 5 done</span>
+          <span className="text-sm text-gray-500">0 of 4 done</span>
         </div>
         <div className="space-y-4">
           {tasks.map((task, index) => (
