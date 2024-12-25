@@ -80,7 +80,7 @@ export default function UploadInfo() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    const formData = new FormData();
     const fileInput = document.getElementById("bill-input") as HTMLInputElement;
     const files = fileInput.files;
 
@@ -89,27 +89,75 @@ export default function UploadInfo() {
       return;
     }
 
-    if (files.length > 10) {
-      setError("You can only upload up to 10 files.");
+    // Add file size validation
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit per file
+    const TOTAL_SIZE_LIMIT = 20 * 1024 * 1024; // 20MB total limit
+    let totalSize = 0;
+
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].size > MAX_FILE_SIZE) {
+        setError(`File ${files[i].name} is too large. Maximum size is 5MB per file.`);
+        return;
+      }
+      totalSize += files[i].size;
+    }
+
+    if (totalSize > TOTAL_SIZE_LIMIT) {
+      setError("Total file size is too large. Maximum combined size is 20MB.");
       return;
     }
+
+    Array.from(files).forEach((file) => formData.append("files", file));
+    formData.append("firstName", (document.getElementById("first-name") as HTMLInputElement).value);
+    formData.append("lastName", (document.getElementById("last-name") as HTMLInputElement).value);
+    formData.append("dateOfBirth", (document.getElementById("date-of-birth") as HTMLInputElement).value);
 
     setLoading(true);
     setError(null);
 
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Set demo result and redirect
-      setAnalysisResult(DEMO_RESULT);
-      router.push("/results");
-    } catch (error) {
-      console.error("Error:", error);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        body: formData,
+      });
+    console.log("Response status:", response.status);
+
+    if (!response.ok){
+      const errorData = await response.text();
+      console.error("API Error:", errorData);
+      throw new Error ("Failed to analyze bill");
     }
+
+    const result = await response.json();
+    console.log("API Response:", result); // Debug log
+
+    if (!result.analysis) {
+      throw new Error("Invalid response format - missing analysis data");
+    }
+    setAnalysisResult(result.analysis);
+    console.log("Analysis set, navigating to results..."); // Debug log
+    router.push("/results");
+  }catch (error) {
+    console.error("Error:", error);
+    setError("Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+  
+
+    // try {
+    //   // Simulate API delay
+    //   await new Promise(resolve => setTimeout(resolve, 2000));
+      
+    //   // Set demo result and redirect
+    //   setAnalysisResult(DEMO_RESULT);
+    //   router.push("/results");
+    // } catch (error) {
+    //   console.error("Error:", error);
+    //   setError("Something went wrong. Please try again.");
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (

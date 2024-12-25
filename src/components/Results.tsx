@@ -1,63 +1,66 @@
 'use client'
-import React from "react";
+import React, { useContext } from "react";
 import { useRouter } from "next/navigation";
-import { useAnalysis } from "../lib/context/AnalysisContext";
-import { BeatLoader } from 'react-spinners';
+// import { BeatLoader } from 'react-spinners';
+import { useAnalysis } from "../lib/context/AnalysisContext"; 
+// import { useContext } from "react";  // Add this import
 
-// Demo data stays the same...
-const DEMO_DATA = {
-  analysis: {
-    summary: "Significant overcharging detected for both procedures, with invalid code usage (B002) and charges exceeding UCR rates by substantial margins",
-    recommendations: "Contact provider to dispute charges and request itemized bill",
-    details: {
-      ucr_validation: {
-        procedure_analysis: [
-          {
-            description: "Cell enumeration & id",
-            billed_cost: 300,
-            ucr_rate: 150,
-            difference: 150,
-            percentage_difference: 100,
-            is_reasonable: false,
-            comments: "Billed amount significantly higher than estimated UCR rate"
-          },
-          {
-            description: "X-ray",
-            billed_cost: 450,
-            ucr_rate: 87.50,
-            difference: 362.50,
-            percentage_difference: 514,
-            is_reasonable: false,
-            comments: "Billed amount exceeds UCR rate by over 500%"
-          }
-        ],
-        overall_assessment: "Multiple procedures show significant overcharging patterns",
-        recommendations: [
-          "Contest the X-ray charge as it exceeds normal rates by over 500%",
-          "Request detailed itemization for cell enumeration procedure",
-          "Consider filing a complaint with insurance provider"
-        ],
-        references: [
-          "Medicare Fee Schedule 2024",
-          "Regional UCR Database Q1 2024"
-        ]
-      }
-    }
-  }
-};
+// // Demo data stays the same...
+// const DEMO_DATA = {
+//   analysis: {
+//     summary: "Significant overcharging detected for both procedures, with invalid code usage (B002) and charges exceeding UCR rates by substantial margins",
+//     recommendations: "Contact provider to dispute charges and request itemized bill",
+//     details: {
+//       ucr_validation: {
+//         procedure_analysis: [
+//           {
+//             description: "Cell enumeration & id",
+//             billed_cost: 300,
+//             ucr_rate: 150,
+//             difference: 150,
+//             percentage_difference: 100,
+//             is_reasonable: false,
+//             comments: "Billed amount significantly higher than estimated UCR rate"
+//           },
+//           {
+//             description: "X-ray",
+//             billed_cost: 450,
+//             ucr_rate: 87.50,
+//             difference: 362.50,
+//             percentage_difference: 514,
+//             is_reasonable: false,
+//             comments: "Billed amount exceeds UCR rate by over 500%"
+//           }
+//         ],
+//         overall_assessment: "Multiple procedures show significant overcharging patterns",
+//         recommendations: [
+//           "Contest the X-ray charge as it exceeds normal rates by over 500%",
+//           "Request detailed itemization for cell enumeration procedure",
+//           "Consider filing a complaint with insurance provider"
+//         ],
+//         references: [
+//           "Medicare Fee Schedule 2024",
+//           "Regional UCR Database Q1 2024"
+//         ]
+//       }
+//     }
+//   }
+// };
 
 function Results() {
   const router = useRouter();
-  const analysisResult = DEMO_DATA;
+  const { analysisResult } = useAnalysis();
+  console.log("Raw analysis result:", analysisResult);
 
   const formatCurrency = (value: number | null | undefined) => {
     if (value == null) return '-';
     return `$${value.toLocaleString()}`;
   };
 
-  const procedures = analysisResult?.analysis?.details?.ucr_validation?.procedure_analysis || [];
-  const recommendations = analysisResult?.analysis?.details?.ucr_validation?.recommendations || [];
-  const references = analysisResult?.analysis?.details?.ucr_validation?.references || [];
+  const procedures = analysisResult?.ucr_validation?.procedure_analysis || [];
+  const recommendations = analysisResult?.recommendations || [];
+  const references = analysisResult?.ucr_validation?.references || [];
+  const summary = analysisResult?.summary || '';
 
   if (!analysisResult) {
     return (
@@ -83,7 +86,7 @@ function Results() {
           <section className="mb-4">
             <h3 className="text-xl font-semibold mb-2">Summary</h3>
             <div className="bg-gray-100 p-4 rounded">
-              <p>{analysisResult?.analysis?.summary}</p>
+              <p>{analysisResult?.summary}</p>
             </div>
           </section>
 
@@ -103,7 +106,7 @@ function Results() {
                   </tr>
                 </thead>
                 <tbody>
-                  {procedures.map((procedure, index) => (
+                  {procedures.map((procedure:string, index) => (
                     <tr key={index} className="hover:bg-gray-50">
                       <td className="px-4 py-2 border">{index + 1}</td>
                       <td className="px-4 py-2 border">{procedure?.description || '-'}</td>
@@ -121,7 +124,7 @@ function Results() {
               <div className="mt-4">
                 <h4 className="font-medium mb-2">Recommendations</h4>
                 <ul className="list-disc pl-5">
-                  {recommendations.map((recommendation, index) => (
+                  {recommendations.map((recommendation:string, index) => (
                     <li key={index} className="mb-1">{recommendation}</li>
                   ))}
                 </ul>
