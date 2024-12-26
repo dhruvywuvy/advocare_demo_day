@@ -1,0 +1,155 @@
+{
+  "success": true,
+  "extracted_text": {
+    "patient_info": {
+      "name": "",
+      "ssn": "",
+      "dob": "",
+      "address": "",
+      "insurance_policy": ""
+    },
+    "visit_info": {
+      "date_of_visit": "",
+      "provider_info": "",
+      "doctor": "",
+      "location": ""
+    },
+    "billing_details": {
+      "charges": 0,
+      "procedure_codes": [
+        {
+          "code": "Anes Regional 1st 30min",
+          "description": "Anesthesia",
+          "quantity": 1,
+          "cost": 2115.57
+        },
+        {
+          "code": "Anes Regional Ea Addl 15min",
+          "description": "Anesthesia",
+          "quantity": 1,
+          "cost": 662.32
+        },
+        {
+          "code": "ER Facility Level 3 - 99283 (CPT\u00ae)",
+          "description": "Emergency Room",
+          "quantity": 1,
+          "cost": 2464.68
+        },
+        {
+          "code": "Epidural Initiation",
+          "description": "Labor Room/Delivery",
+          "quantity": 1,
+          "cost": 489.73
+        },
+        {
+          "code": "Vaginal Delivery Singleton - 59409 (CPT\u00ae)",
+          "description": "Labor Room/Delivery",
+          "quantity": 1,
+          "cost": 5999.16
+        },
+        {
+          "code": "Cbc/Diff - 85025 (CPT\u00ae)",
+          "description": "Laboratory",
+          "quantity": 1,
+          "cost": 158.07
+        },
+        {
+          "code": "Comprehensive Metabolic Pnl - 80053 (CPT\u00ae)",
+          "description": "Laboratory",
+          "quantity": 1,
+          "cost": 126.49
+        },
+        {
+          "code": "Creatinine-Urine Random - 82570 (CPT\u00ae)",
+          "description": "Laboratory",
+          "quantity": 1,
+          "cost": 93.9
+        },
+        {
+          "code": "Protein, Urine Random - 84156 (CPT\u00ae)",
+          "description": "Laboratory",
+          "quantity": 1,
+          "cost": 158.23
+        },
+        {
+          "code": "Abo Group Type - 86900 (CPT\u00ae)",
+          "description": "Laboratory",
+          "quantity": 1,
+          "cost": 204.8
+        },
+        {
+          "code": "ABSC - 86850 (CPT\u00ae)",
+          "description": "Laboratory",
+          "quantity": 1,
+          "cost": 165.69
+        },
+        {
+          "code": "Rh Type - 86901 (CPT\u00ae)",
+          "description": "Laboratory",
+          "quantity": 1,
+          "cost": 100.89
+        },
+        {
+          "code": "Venipuncture (Lab) - 36415 (CPT\u00ae)",
+          "description": "Laboratory",
+          "quantity": 1,
+          "cost": 73.14
+        },
+        {
+          "code": "Hematocrit - 85014 (CPT\u00ae)",
+          "description": "Laboratory",
+          "quantity": 1,
+          "cost": 96.51
+        },
+        {
+          "code": "Hemoglobin - 85018 (CPT\u00ae)",
+          "description": "Laboratory",
+          "quantity": 1,
+          "cost": 99.67
+        },
+        {
+          "code": "Ty Epidural Perifix Espocan 333194 - C1755 (HCPCS)",
+          "description": "Medical/Surgical Supplies and Devices",
+          "quantity": 1,
+          "cost": 235.6
+        },
+        {
+          "code": "Cath Ty Um Foley W/Statlok 16f 902416 - C1758 (HCPCS)",
+          "description": "Medical/Surgical Supplies and Devices",
+          "quantity": 1,
+          "cost": 114.5
+        },
+        {
+          "code": "Sut Vcrl 4-0 27in Sh Ud J415h",
+          "description": "Medical/Surgical Supplies and Devices",
+          "quantity": 1,
+          "cost": 10.43
+        },
+        {
+          "code": "Sut Vcrl 3-0 CT-1 X J944h",
+          "description": "Medical/Surgical Supplies and Devices",
+          "quantity": 1,
+          "cost": 10.86
+        },
+        {
+          "code": "Sut Vcrl 2-0 36in Ct1 Und J945h",
+          "description": "Medical/Surgical Supplies and Devices",
+          "quantity": 1,
+          "cost": 10.86
+        },
+        {
+          "code": "Insrt Non Indwel Strait Cth - 51701 (CPT\u00ae)",
+          "description": "Other Therapeutic Services",
+          "quantity": 1,
+          "cost": 450.33
+        }
+      ],
+      "total_cost": 15230.67,
+      "insurance_coverage": 0,
+      "amount_due": 0
+    },
+    "diagnoses": [],
+    "notes": ""
+  },
+  "file_type": "image/jpeg"
+}

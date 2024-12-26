@@ -7,10 +7,11 @@ from .perplexity import search_ucr_rates
 from .database import load_cpt_database, load_medicare_database  
 import sys
 from PyPDF2 import PdfReader
-from PIL import Image
+# from PIL import Image
 import io
 import math
-
+import asyncio
+import aiohttp
 
 # app/services/bill_analyzer.py
 
@@ -143,52 +144,36 @@ async def explanation_handler(results):
 
 async def analyze_medical_bill(user_input):
     try:
-        # bills = user_input['bills']
-        # results = []
-
-        # for bill in bills:
-        #     content = bill['content']  # This is binary data (PDF/image)
-        #     content_type = bill['content_type']
-
-        #     # Validate file type
-        #     if not content_type.startswith(('application/pdf', 'image/')):
-        #         raise Exception(f"Unsupported file type: {content_type}. Please upload PDF or image files only.")
-
-        #     # Check if content is empty
-        #     if not content:
-        #         raise Exception("File content is empty")
-
-        #     print(f"File size before processing: {len(content)} bytes", file=sys.stdout)
-        #     # Get file size in MB
-        #     file_size = len(content) / (1024 * 1024)  # Convert to MB
-        #     if file_size > 25:  # If file is larger than 25MB
-        #         raise Exception(f"File too large ({file_size:.1f}MB). Maximum size is 25MB.")
-
-        #     # Add debug print to see content before Claude
-        #     print(f"Content type: {content_type}, First 100 bytes: {content[:100]}", file=sys.stdout)
-
-        #     # Process the bill with Claude (which handles OCR and text conversion)
-        #     structured_bill = await analyze_bill_with_claude(content, content_type)
-
-        #     if structured_bill is None:
-        #         raise Exception("Failed to analyze the bill")
+       
         results = []
         claude_results = user_input['claude_analyses'][0]['extracted_text'] 
-        # Run the analyses using the structured bill
-        code_result = await code_validation(claude_results)
-        results.append(code_result)
 
-        ucr_result = await ucr_validation(claude_results)
+        # Filter only needed data for each validation
+        # validation_data = {
+        #     "procedure_codes": claude_results['billing_details']['procedure_codes'],
+        #     "total_cost": claude_results['billing_details']['total_cost']
+        # }
+
+       
+
+        # ucr_validation_data = {
+        #     "procedure_codes": [
+        #         {
+        #             "code": code["code"],
+        #             "cost": code["cost"]
+        #         } 
+        #         for code in claude_results['billing_details']['procedure_codes']
+        #     ],
+        #     "total_cost": claude_results['billing_details']['total_cost']
+        # }
+        # Run the analyses using the structured bill
+        code_result, ucr_result = await asyncio.gather(
+            code_validation(claude_results),
+            ucr_validation(claude_results)
+        )
+        results.append(code_result)
         results.append(ucr_result)
         
-        # Generate final report
-        # final_report = await explanation_handler(results)
-        # print(f"check and cheese : {final_report}", file=sys.stdout)
-        # # Add patient info to final report
-        # final_report["patient_info"] = {
-        #     "name": f"{user_input['patient_info']['first_name']} {user_input['patient_info']['last_name']}",
-        #     "date_of_birth": user_input['patient_info']['date_of_birth']
-        # }
 
         try:
             # Generate final report
@@ -207,118 +192,178 @@ async def analyze_medical_bill(user_input):
         print(f"Error in analyze_medical_bill: {str(e)}")
         raise Exception(f"Analysis failed: {str(e)}")
 
+# # original code_validation
+# async def code_validation(bill):
+#     """Validate all procedure codes in parallel"""
+#     icd_api = 'https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search'
+#     hcpcs_api = 'https://clinicaltables.nlm.nih.gov/api/hcpcs/v3/search'
+    
+#     cpt_codes = await load_cpt_database()
+    
+#     invalid_codes = []
+#     valid_codes = []
+
+#     # Process the codes from the demo bill
+#     for procedure in bill["billing_details"]["procedure_codes"]:
+#         code = procedure["code"]
+#         response = requests.get(icd_api, params={"terms": code, "sf": "code", "df": "code,name"})
+#         if response.status_code == 200:
+#             data = response.json()
+#             if data[1]:  # Valid ICD-10 code
+#                 valid_codes.append({"code": code, "description": data[3][0][1], "type": "ICD-10"})
+#             else:  # Try HCPCS
+#                 response = requests.get(hcpcs_api, params={"terms": code, "sf": "code", "df": "code,display"})
+#                 if response.status_code == 200:
+#                     data = response.json()
+#                     if data[1]:  # Valid HCPCS code
+#                         valid_codes.append({"code": code, "description": data[3][0][1], "type": "HCPCS"})
+#                     else:
+#                         if code in cpt_codes:  # Check CPT
+#                             valid_codes.append({"code": code, "description": cpt_codes[code], "type": "CPT"})
+#                         else:
+#                             invalid_codes.append(code)
+
+#     prompt = (
+#         f"Analyze the following procedure codes and check for any discrepancies:\n\n"
+#         f"Valid Codes:\n{valid_codes}\n"
+#         f"Invalid Codes:\n{invalid_codes}\n\n"
+#         "Provide your analysis in the following JSON format:\n"
+#         "{\n"
+#         '  "code_validation": {\n'
+#         '    "valid_codes": [{"code": "...", "description": "...", "type": "..."}],\n'
+#         '    "invalid_codes": ["..."],\n'
+#         '    "discrepancies": ["..."],\n'
+#         '    "upcoding_risks": ["..."],\n'
+#         '    "errors": ["..."]\n'
+#         "  }\n"
+#         "}\n\n"
+#     )
+
+#     result = await analyze_with_claude(prompt)
+#     return {"code_validation": result}
+
+#new code_validation
 async def code_validation(bill):
-    icd_api = 'https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search'
-    hcpcs_api = 'https://clinicaltables.nlm.nih.gov/api/hcpcs/v3/search'
-    
-    cpt_codes = await load_cpt_database()
-    
-    invalid_codes = []
-    valid_codes = []
-
-    # Process the codes from the demo bill
-    for procedure in bill["billing_details"]["procedure_codes"]:
-        code = procedure["code"]
-        response = requests.get(icd_api, params={"terms": code, "sf": "code", "df": "code,name"})
-        if response.status_code == 200:
-            data = response.json()
-            if data[1]:  # Valid ICD-10 code
-                valid_codes.append({"code": code, "description": data[3][0][1], "type": "ICD-10"})
-            else:  # Try HCPCS
-                response = requests.get(hcpcs_api, params={"terms": code, "sf": "code", "df": "code,display"})
-                if response.status_code == 200:
-                    data = response.json()
-                    if data[1]:  # Valid HCPCS code
-                        valid_codes.append({"code": code, "description": data[3][0][1], "type": "HCPCS"})
-                    else:
-                        if code in cpt_codes:  # Check CPT
-                            valid_codes.append({"code": code, "description": cpt_codes[code], "type": "CPT"})
-                        else:
-                            invalid_codes.append(code)
-
-    prompt = (
-        f"Analyze the following procedure codes and check for any discrepancies:\n\n"
-        f"Valid Codes:\n{valid_codes}\n"
-        f"Invalid Codes:\n{invalid_codes}\n\n"
-        "Provide your analysis in the following JSON format:\n"
-        "{\n"
-        '  "code_validation": {\n'
-        '    "valid_codes": [{"code": "...", "description": "...", "type": "..."}],\n'
-        '    "invalid_codes": ["..."],\n'
-        '    "discrepancies": ["..."],\n'
-        '    "upcoding_risks": ["..."],\n'
-        '    "errors": ["..."]\n'
-        "  }\n"
-        "}\n\n"
-    )
-
-    result = await analyze_with_claude(prompt)
-    return {"code_validation": result}
-
-async def chunk_and_analyze(content: bytes, content_type: str, chunk_size: int = 8000) -> list:
-    """Split content into manageable chunks and analyze each separately"""
-    chunks = []
-    
-    print(f"Processing file of type: {content_type}", file=sys.stdout)
-    
-    if content_type.startswith('application/pdf'):
-        # Handle PDF
-        pdf_file = io.BytesIO(content)
-        pdf_reader = PdfReader(pdf_file)
+    """Validate all procedure codes in parallel"""
+    try:
+        validation_tasks = []
         
-        print(f"PDF has {len(pdf_reader.pages)} pages", file=sys.stdout)
+        # Create tasks for each procedure code
+        for procedure in bill["billing_details"]["procedure_codes"]:
+            validation_tasks.append(validate_single_code(procedure))
         
-        # Process one page at a time
-        for page_num in range(len(pdf_reader.pages)):
-            page = pdf_reader.pages[page_num]
-            text = page.extract_text()
-            print(f"Page {page_num + 1} extracted text length: {len(text)}", file=sys.stdout)
-            chunks.append(text)
-            
-    elif content_type.startswith('image/'):
-        # Handle Image
-        image = Image.open(io.BytesIO(content))
-        # Convert to RGB if necessary
-        if image.mode not in ('RGB', 'L'):
-            image = image.convert('RGB')
-            
-        # Split image into smaller sections if too large
-        width, height = image.size
-        max_dimension = 2000  # Maximum dimension for each chunk
+        # Run all validations concurrently
+        validation_results = await asyncio.gather(*validation_tasks)
         
-        if width > max_dimension or height > max_dimension:
-            # Calculate number of sections needed
-            sections_x = math.ceil(width / max_dimension)
-            sections_y = math.ceil(height / max_dimension)
+        # Combine results
+        return {
+            "validation_results": validation_results,
+            "summary": "Code validation completed",
+            "total_codes_checked": len(validation_results)
+        }
+        
+    except Exception as e:
+        print(f"Error in code validation: {str(e)}")
+        return {"error": str(e)}
+
+async def validate_single_code(procedure):
+    """Validate a single procedure code"""
+    code = procedure["code"]
+    cost = procedure["cost"]
+    
+    try:
+        # Check both ICD and HCPCS APIs
+        async with aiohttp.ClientSession() as session:
+            # ICD API call
+            icd_url = f"https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code&df=code,name&terms={code}"
+            async with session.get(icd_url) as icd_response:
+                icd_data = await icd_response.json()
+
+            # HCPCS API call
+            hcpcs_url = f"https://hcpcs.codes/api/v1/codes/{code}"
+            async with session.get(hcpcs_url) as hcpcs_response:
+                hcpcs_data = await hcpcs_response.json()
+
+        # Process responses
+        is_valid_icd = len(icd_data[3]) > 0 if isinstance(icd_data, list) and len(icd_data) > 3 else False
+        is_valid_hcpcs = 'code' in hcpcs_data and hcpcs_data['code'] == code
+
+        # Combine validation results
+        return {
+            "code": code,
+            "cost": cost,
+            "is_valid": is_valid_icd or is_valid_hcpcs,
+            "icd_details": icd_data[3][0] if is_valid_icd else None,
+            "hcpcs_details": hcpcs_data if is_valid_hcpcs else None,
+            "validation_source": "ICD-10" if is_valid_icd else "HCPCS" if is_valid_hcpcs else "Unknown"
+        }
+        
+    except Exception as e:
+        return {
+            "code": code,
+            "cost": cost,
+            "is_valid": False,
+            "error": str(e)
+        }
+    
+async def chunk_and_analyze(content: bytes, content_type: str, max_chunk_size: int = 8000) -> list:
+    """Process large files in chunks"""
+    try:
+        print(f"Starting chunk analysis for {content_type}", file=sys.stdout)
+        
+        if content_type.startswith('application/pdf'):
+            # Handle PDF
+            pdf = PdfReader(io.BytesIO(content))
+            chunks = []
             
-            print(f"Splitting image into {sections_x}x{sections_y} sections", file=sys.stdout)
-            
-            for i in range(sections_x):
-                for j in range(sections_y):
-                    left = i * max_dimension
-                    top = j * max_dimension
-                    right = min((i + 1) * max_dimension, width)
-                    bottom = min((j + 1) * max_dimension, height)
+            # Process each page as a chunk
+            for page in pdf.pages:
+                text = page.extract_text()
+                if text.strip():  # Only add non-empty pages
+                    chunks.append(text)
                     
-                    section = image.crop((left, top, right, bottom))
-                    # Convert section to bytes
-                    section_bytes = io.BytesIO()
-                    section.save(section_bytes, format='JPEG', quality=85)
-                    chunks.append(section_bytes.getvalue())
+        elif content_type.startswith('image/'):
+            # For images, we'll process in one go since Claude can handle them
+            chunks = [content]
         else:
-            # Image is small enough to process as is
-            chunks.append(content)
+            raise ValueError(f"Unsupported file type: {content_type}")
 
-    # Process chunks with Claude
-    results = []
-    for i, chunk in enumerate(chunks):
-        print(f"Processing chunk {i+1} of {len(chunks)}", file=sys.stdout)
-        try:
-            result = await analyze_bill_with_claude(chunk, content_type)
-            if result:
-                results.append(result)
-        except Exception as e:
-            print(f"Error processing chunk {i+1}: {str(e)}", file=sys.stderr)
-            continue
+        # Process chunks concurrently
+        tasks = [
+            analyze_bill_with_claude(chunk, content_type)
+            for chunk in chunks
+        ]
+        
+        results = await asyncio.gather(*tasks)
+        
+        # Combine results from all chunks
+        combined_result = combine_chunk_results(results)
+        
+        return combined_result
+        
+    except Exception as e:
+        print(f"Error in chunk_and_analyze: {str(e)}", file=sys.stderr)
+        raise
 
-    return results
+def combine_chunk_results(results: list) -> dict:
+    """Combine results from multiple chunks"""
+    combined = {
+        'extracted_text': {
+            'billing_details': {
+                'procedure_codes': [],
+                'total_cost': 0
+            }
+        }
+    }
+    
+    for result in results:
+        if result and 'extracted_text' in result:
+            # Combine procedure codes
+            codes = result['extracted_text'].get('billing_details', {}).get('procedure_codes', [])
+            combined['extracted_text']['billing_details']['procedure_codes'].extend(codes)
+            
+            # Add costs
+            total = result['extracted_text'].get('billing_details', {}).get('total_cost', 0)
+            combined['extracted_text']['billing_details']['total_cost'] += total
+    
+    return combined

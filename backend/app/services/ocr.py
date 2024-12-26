@@ -4,6 +4,10 @@ from anthropic import Client
 import os
 from dotenv import load_dotenv
 import json
+import io
+from PyPDF2 import PdfReader
+import asyncio
+
 
 load_dotenv()
 client = Client(api_key=os.getenv('ANTHROPIC_API_KEY'))
@@ -94,3 +98,4 @@ async def extract_text_from_document(file_content: bytes, file_type: str) -> dic
             "error": str(e),
             "file_type": file_type
         }
+
