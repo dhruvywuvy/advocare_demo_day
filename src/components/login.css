@@ -15,6 +15,7 @@
 #login-container h2 {
   text-transform: uppercase;
   letter-spacing: 2px;
+  transform: translateX(400px);
 }
 
 #login-formbox {
