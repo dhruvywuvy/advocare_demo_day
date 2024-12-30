@@ -19,12 +19,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check active sessions and sets the user
-    const session = supabase.auth.getSession();
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { user: currentUser } = await getCurrentUser();
+        setUser(currentUser);
+      }
+      setLoading(false);
+    };
+    
+    checkSession();
 
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
-        const { user: currentUser, error } = await getCurrentUser();
+        const { user: currentUser } = await getCurrentUser();
         setUser(currentUser);
       } else {
         setUser(null);
@@ -45,5 +54,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

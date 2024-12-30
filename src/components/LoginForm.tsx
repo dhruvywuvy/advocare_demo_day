@@ -37,7 +37,7 @@ export default function LoginForm() {
 
       if (user) {
         console.log('Login response data:', { user, profile });
-        const currentUser = await supabase.auth.getUser()
+        //const currentUser = await supabase.auth.getUser()
         router.push('/marketplace');
 
         // Handle successful login here - e.g., redirect or update app state
