@@ -1,13 +1,13 @@
 from openai import OpenAI
 import os
-# import sys
 from dotenv import load_dotenv
 import time
 import json
 import asyncio
 import re
 import tiktoken
-#Medicare RVU
+# from .cache import CacheService
+
 load_dotenv()
 
 api_key = os.getenv("PERPLEXITY_API_KEY")
@@ -17,7 +17,8 @@ api_key = os.getenv("PERPLEXITY_API_KEY")
 
 # Initialize the OpenAI client with Perplexity's base URL
 client = OpenAI(api_key=api_key, base_url="https://api.perplexity.ai")
-# remember to add location into input text
+
+# remember to add location into input text. Functional search function
 async def search_ucr_rates(input_text, max_retries=3):
     start_time = time.time()
     
@@ -150,19 +151,39 @@ def count_tokens(messages):
     return num_tokens
 
 
-# result = search_ucr_rates(bill)
-# print(result)
+# class PerplexityService:
+#     def __init__(self):
+#         self.cache_service = CacheService()
 
-# Main function
-# def main():
-#     # Run the analysis with the provided medical bill
-#     #use below code once RAG comes in
-#     # filepath = sys.argv[1]
-#     # with open(filepath, 'r') as file:
-#     #     bill = json.load(file)
-#     final_report = search_ucr_rates("thre isnt much to say")
-#     print(final_report)
-
-# Entry point for the script
-# if __name__ == "__main__":
-#     main()
+#     async def search_ucr_rates(self, input_text, max_retries=3):
+#         start_time = time.time()
+        
+#         # Extract codes from input
+#         codes = extract_codes(input_text)  # You'll need to implement this
+#         location = "Los Angeles, CA"
+        
+#         # Check cache first
+#         cached_rates = await self.cache_service.bulk_get_cached_rates(codes, location)
+#         codes_to_search = [code for code in codes if code not in cached_rates]
+        
+#         if not codes_to_search:
+#             return format_results(list(cached_rates.values()))
+        
+#         # Your existing API call code for remaining codes
+#         for attempt in range(max_retries):
+#             try:
+#                 # ... your existing code ...
+                
+#                 # Cache new results
+#                 if "ucr_validation" in parsed and "procedure_analysis" in parsed["ucr_validation"]:
+#                     for proc in parsed["ucr_validation"]["procedure_analysis"]:
+#                         if proc.get("standardized_rate") and proc["standardized_rate"] > 0:
+#                             await self.cache_service.cache_rate(
+#                                 proc["code"],
+#                                 location,
+#                                 proc
+#                             )
+                
+#                 # Combine cached and new results
+#                 all_results = list(cached_rates.values()) + parsed["ucr_validation"]["procedure_analysis"]
+#                 return format_results(all_results)

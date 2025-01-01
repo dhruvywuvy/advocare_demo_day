@@ -10,6 +10,11 @@ import asyncio
 import re
 import time
 from functools import lru_cache
+from PIL import Image
+import cv2
+import numpy as np
+from io import BytesIO
+
 
 
 load_dotenv()
@@ -27,13 +32,17 @@ async def extract_text_from_document(file_content: bytes, file_type: str, max_re
         pdf = PdfReader(io.BytesIO(file_content))
         # Convert first page to image or use directly if Claude supports PDF
         file_content = pdf.pages[0].extract_bytes()  # Or implement PDF->image conversion
+    if file_type.startswith('image/'):
+        file_content = await preprocess_image(file_content)
+        file_type = 'image/png'  # Use PNG for processed images
     
     for attempt in range(max_retries):
         try:
             encoded_content = base64.b64encode(file_content).decode('utf-8')
             response = client.messages.create(
                 model="claude-3-haiku-20240307",
-                max_tokens=1500,
+                # model="claude-3-5-sonnet-20240620",
+                max_tokens=2000,
                 system="You're a text analyser that outputs only json array objects...",
                 messages=[{
                     "role": "user",
@@ -77,10 +86,9 @@ async def extract_text_from_document(file_content: bytes, file_type: str, max_re
                             4. "quantity" is the number of units of the procedure
                             5. "cost" is the cost of the procedure
                             6. For calculating total_cost:
-                               ONLY include costs that meet these criteria:
-                               - Has a specific procedure code (CPT/HCPCS)
-                               - Is an individual line item, not a category total
-                               - Is the most detailed level of cost (lowest in the hierarchy)
+                               - Sum of costs that meet these criteria:
+                                - Has a specific procedure code (CPT/HCPCS)
+                                - Is an individual line item, not a category total
                                
                                IGNORE these costs:
                                - Category headers (like "Medical/Surgical Supplies Total: $382.25")
@@ -145,3 +153,33 @@ async def extract_text_from_document(file_content: bytes, file_type: str, max_re
         "file_type": file_type
     }
 
+async def preprocess_image(file_content: bytes) -> bytes:
+    """Preprocess image for better OCR performance"""
+    # Convert bytes to PIL Image
+    image = Image.open(BytesIO(file_content))
+    
+    # Convert to numpy array for OpenCV processing
+    img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    
+    # 1. Resize if image is too large (reduces tokens)
+    max_dimension = 2000
+    height, width = img.shape[:2]
+    if max(height, width) > max_dimension:
+        scale = max_dimension / max(height, width)
+        img = cv2.resize(img, None, fx=scale, fy=scale)
+    
+    # 2. Convert to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # 3. Apply thresholding to get black and white image
+    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    
+    # 4. Denoise
+    denoised = cv2.fastNlMeansDenoising(thresh)
+    
+    # 5. Increase contrast
+    contrast = cv2.convertScaleAbs(denoised, alpha=1.5, beta=0)
+    
+    # Convert back to bytes
+    is_success, buffer = cv2.imencode(".png", contrast)
+    return buffer.tobytes() 

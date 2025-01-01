@@ -1,48 +1,84 @@
-from supabase import create_client
-import os
-import json
-from datetime import datetime, timedelta
+# from supabase import create_client, Client
+# import os
+# from datetime import datetime, timedelta
+# from typing import Optional, Dict, Any
 
-supabase = create_client(
-    os.environ.get("SUPABASE_URL"),
-    os.environ.get("SUPABASE_KEY")
-)
+# class CacheService:
+#     def __init__(self):
+#         self.supabase: Client = create_client(
+#             os.getenv("SUPABASE_URL"),
+#             os.getenv("SUPABASE_KEY")
+#         )
+#         self.CACHE_DURATION = timedelta(days=30)
 
-def supabase_cache(table: str, expire_hours: int = 24):
-    """
-    Decorator for Supabase caching
-    """
-    def decorator(func):
-        async def wrapper(*args, **kwargs):
-            cache_key = f"{func.__name__}:{':'.join(str(arg) for arg in args)}"
+#     async def get_cached_rate(self, code: str, location: str) -> Optional[Dict[str, Any]]:
+#         """Retrieve cached rate for a code/location combination"""
+#         try:
+#             result = self.supabase.table("standardized_rates").select("*").eq(
+#                 "code", code
+#             ).eq(
+#                 "location", location
+#             ).execute()
             
-            # Check cache
-            result = supabase.table('cache').select('data, created_at') \
-                .eq('key', cache_key) \
-                .single() \
-                .execute()
+#             if result.data:
+#                 cached_rate = result.data[0]
+#                 cache_date = datetime.fromisoformat(cached_rate['created_at'])
+                
+#                 if datetime.now() - cache_date < self.CACHE_DURATION:
+#                     return {
+#                         "code": cached_rate["code"],
+#                         "description": cached_rate.get("description", ""),
+#                         "standardized_rate": cached_rate["standardized_rate"],
+#                         "sources": cached_rate["sources"]
+#                     }
+#             return None
             
-            # If found and not expired
-            if result.data:
-                created_at = datetime.fromisoformat(result.data['created_at'])
-                if datetime.now() - created_at < timedelta(hours=expire_hours):
-                    return json.loads(result.data['data'])
-            
-            # If not found or expired, get new data
-            result = await func(*args, **kwargs)
-            
-            # Update cache
-            supabase.table('cache').upsert({
-                'key': cache_key,
-                'data': json.dumps(result),
-                'created_at': datetime.now().isoformat()
-            }).execute()
-            
-            return result
-        return wrapper
-    return decorator
+#         except Exception as e:
+#             print(f"Cache retrieval error: {str(e)}")
+#             return None
 
-# Usage
-@supabase_cache("ucr_rates", 24)
-async def search_ucr_rates(procedure_code: str):
-    return await perplexity_search(procedure_code)
+#     async def cache_rate(self, code: str, location: str, rate_data: dict) -> bool:
+#         """Store new rate in cache"""
+#         try:
+#             data = {
+#                 "code": code,
+#                 "location": location,
+#                 "description": rate_data.get("description", ""),
+#                 "standardized_rate": rate_data["standardized_rate"],
+#                 "sources": rate_data["sources"],
+#                 "created_at": datetime.now().isoformat()
+#             }
+#             self.supabase.table("standardized_rates").upsert(
+#                 data, 
+#                 on_conflict="code,location"
+#             ).execute()
+#             return True
+            
+#         except Exception as e:
+#             print(f"Cache storage error: {str(e)}")
+#             return False
+
+#     async def bulk_get_cached_rates(self, codes: list[str], location: str) -> dict:
+#         """Get cached rates for multiple codes at once"""
+#         try:
+#             result = self.supabase.table("standardized_rates").select("*").in_(
+#                 "code", codes
+#             ).eq(
+#                 "location", location
+#             ).execute()
+            
+#             cached_rates = {}
+#             for rate in result.data:
+#                 cache_date = datetime.fromisoformat(rate['created_at'])
+#                 if datetime.now() - cache_date < self.CACHE_DURATION:
+#                     cached_rates[rate["code"]] = {
+#                         "code": rate["code"],
+#                         "description": rate.get("description", ""),
+#                         "standardized_rate": rate["standardized_rate"],
+#                         "sources": rate["sources"]
+#                     }
+#             return cached_rates
+            
+#         except Exception as e:
+#             print(f"Bulk cache retrieval error: {str(e)}")
+#             return {}
