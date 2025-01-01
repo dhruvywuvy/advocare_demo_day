@@ -2,7 +2,7 @@ import asyncio
 import json
 import base64
 from app.services.ocr import extract_text_from_document
-from app.services.bill_analyzer import code_validation, ucr_validation
+from app.services.bill_analyzer import code_validation, ucr_validation, explanation_handler
 import time
 
 async def test_ocr_and_save():
@@ -32,12 +32,16 @@ async def load_saved_and_test_validation():
     # Test specific validation
     start_time = time.time()
     
-    # validation_result = await code_validation(ocr_result["extracted_text"])
-    validation_result = await ucr_validation(ocr_result["extracted_text"])
+    code_result = await code_validation(ocr_result["extracted_text"])
+    print ("code_result", code_result)
+    ucr_result = await ucr_validation(ocr_result["extracted_text"])
+    results = [code_result, ucr_result]
+    final_result = json.loads(await explanation_handler(results))
     
     end_time = time.time()
-    print(f"Validation time: {end_time - start_time} seconds")
-    print("Result:", validation_result)
+    print(f"Validaation for code,ucr,explanation Validation time: {end_time - start_time} seconds")
+    # print("Result:", final_result)
+    # print("Result:", ucr_result)
 
 # Run tests
 if __name__ == "__main__":

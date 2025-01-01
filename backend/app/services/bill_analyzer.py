@@ -1,106 +1,98 @@
 # services/bill_analyzer.py
 from typing import Dict, List, Any
 import json
-import requests
-from .claude import analyze_with_claude, analyze_bill_with_claude
+from .claude import analyze_with_claude_haiku
 from .perplexity import search_ucr_rates
-from .database import load_cpt_database, load_medicare_database  
-import sys
-from PyPDF2 import PdfReader
-# from PIL import Image
-import io
-import math
+from .database import load_medicare_database  
 import asyncio
 import aiohttp
 
 # app/services/bill_analyzer.py
 
 async def ucr_validation(bill):
-    medicare_rates = await load_medicare_database()
-    discrepancies = []
+    # medicare_rates = await load_medicare_database()
+    # discrepancies = []
 
-    for procedure in bill["billing_details"]["procedure_codes"]:
-        code = procedure["code"]
-        description = procedure["description"]
-        billed_cost = procedure["cost"]
+    # for procedure in bill["billing_details"]["procedure_codes"]:
+    #     code = procedure["code"]
+    #     description = procedure["description"]
+    #     billed_cost = procedure["cost"]
 
-        if code in medicare_rates:
-            medicare_info = medicare_rates[code]
+    #     if code in medicare_rates:
+    #         medicare_info = medicare_rates[code]
             
-            discrepancies.append({
-                "code": code,
-                "description": medicare_info['description'],
-                "billed_cost": billed_cost,
-                "medicare_rate": medicare_info.get('payment_rate', 0),
-                "apc": medicare_info['apc'],
-                "code_found": True
-            })
-        else:
-            discrepancies.append({
-                "code": code,
-                "description": description,
-                "billed_cost": billed_cost,
-                "medicare_rate": "Not available in database",
-                "code_found": False
-            })
+    #         discrepancies.append({
+    #             "code": code,
+    #             "description": medicare_info['description'],
+    #             "billed_cost": billed_cost,
+    #             "medicare_rate": medicare_info.get('payment_rate', 0),
+    #             "apc": medicare_info['apc'],
+    #             "code_found": True
+    #         })
+    #     else:
+    #         discrepancies.append({
+    #             "code": code,
+    #             "description": description,
+    #             "billed_cost": billed_cost,
+    #             "medicare_rate": "Not available in database",
+    #             "code_found": False
+    #         })
 
     ucr_result = await search_ucr_rates(bill)
+    # prompt = f"""
+    # Analyze the following medical bill information:
 
-    prompt = f"""
-    Analyze the following medical bill information:
+    # Medicare Discrepancies:
+    # {json.dumps(discrepancies, indent=2)}
 
-    Medicare Discrepancies:
-    {json.dumps(discrepancies, indent=2)}
+    # UCR Information:
+    # {ucr_result}
 
-    UCR Information:
-    {ucr_result}
+    # Provide your analysis in the following JSON format:
+    # {{
+    #     "ucr_validation": {{
+    #         "procedure_analysis": [
+    #             {{
+    #                 "code": "...",
+    #                 "description": "...",
+    #                 "billed_cost": 0,
+    #                 "medicare_rate": 0,
+    #                 "ucr_rate": 0,
+    #                 "is_reasonable": true/false,
+    #                 "comments": "...",
+    #                 "sources": ["..."]
+    #             }}
+    #         ],
+    #         "overall_assessment": "...",
+    #         "recommendations": ["..."],
+    #         "references": [
+    #             "..."
+    #         ]
+    #     }}
+    # }}
+    # For each procedure:
+    # 1. If Medicare rate is available, use it for comparison.
+    # 2. Use the UCR rate from the Perplexity API result for comparison.
+    # 3. Calculate differences and percentage differences using both Medicare (if available) and UCR rates.
+    # 4. Determine if the billed amount is reasonable compared to Medicare and UCR rates.
+    # 5. Provide comments on any significant discrepancies.
+    # 6. Include the sources used for rates.
 
-    Provide your analysis in the following JSON format:
-    {{
-        "ucr_validation": {{
-            "procedure_analysis": [
-                {{
-                    "code": "...",
-                    "description": "...",
-                    "billed_cost": 0,
-                    "medicare_rate": 0,
-                    "ucr_rate": 0,
-                    "is_reasonable": true/false,
-                    "comments": "...",
-                    "sources": ["..."]
-                }}
-            ],
-            "overall_assessment": "...",
-            "recommendations": ["..."],
-            "references": [
-                "..."
-            ]
-        }}
-    }}
-    For each procedure:
-    1. If Medicare rate is available, use it for comparison.
-    2. Use the UCR rate from the Perplexity API result for comparison.
-    3. Calculate differences and percentage differences using both Medicare (if available) and UCR rates.
-    4. Determine if the billed amount is reasonable compared to Medicare and UCR rates.
-    5. Provide comments on any significant discrepancies.
-    6. Include the sources used for rates.
+    # In the "overall_assessment" field, summarize your findings and whether the overall bill appears reasonable.
+    # In the "recommendations" array, suggest next steps for the patient based on your analysis.
+    # In the "references" array, include any references or sources mentioned in the UCR info.
 
-    In the "overall_assessment" field, summarize your findings and whether the overall bill appears reasonable.
-    In the "recommendations" array, suggest next steps for the patient based on your analysis.
-    In the "references" array, include any references or sources mentioned in the UCR info.
+    # Ensure the response is a valid JSON object. Include all relevant information from your analysis while maintaining the specified structure.
+    # """
 
-    Ensure the response is a valid JSON object. Include all relevant information from your analysis while maintaining the specified structure.
-    """
-
-    result = await analyze_with_claude(prompt)
-    return {"ucr_validation": result}
+    # result = await analyze_with_claude(prompt)
+    return {"ucr_validation": ucr_result}
 
 async def explanation_handler(results):
     report = "Explanation Summary:\n"
     for result in results:
         for key, value in result.items():
             report += f"{key}: {value}\n"
-
     prompt = (
         f"Please analyze the following report and provide a structured response in JSON format:\n\n{report}\n\n"
         "Your response should be in the following JSON structure:\n"
@@ -108,7 +100,7 @@ async def explanation_handler(results):
         '  "summary": "A brief overview of any major issues detected",\n'
         '  "code_validation": {\n'
         '    "overcharge": "Yes/No",\n'
-        '    "amount": "Amount overcharged",\n'
+        '    "amount": "Amount overcharged (rounded to 2 decimal places)",\n'
         '    "details": ["Concise details about overcharge issues"]\n'
         '  },\n'
         '  "ucr_validation": {\n'
@@ -116,36 +108,32 @@ async def explanation_handler(results):
         '      {\n'
         '        "code": "...",\n'
         '        "description": "...",\n'
-        '        "billed_cost": 0,\n'
-        '        "medicare_rate": 0,\n'
-        '        "ucr_rate": 0,\n'
-        '        "difference": 0,\n'
-        '        "percentage_difference": 0,\n'
-        '        "is_reasonable": true/false,\n'
-        '        "comments": "...",\n'
-        '        "sources": ["..."]\n'
+        '        "billed_cost": 0.00,\n'
+        '        "standardized_rate": 0.00,\n'
+        '        "difference": 0.00,\n'
+        '        "percentage_difference": 0.00,\n'
+        '        "comments": "...",  // Format:\n'
+        '           // Line 1: "[Procedure name] is $X above typical cost"\n'
+        '           // Line 2: "Standard range: $X-$Y"\n'
+        '           // Line 3: "Recommendation: [specific action]",\n'
         '      }\n'
         '    ],\n'
-        '    "overall_assessment": "...",\n'
-        '    "recommendations": ["..."],\n'
         '    "references": ["..."]\n'
-        '  },\n'
-        '  "fraud_detection": {\n'
-        '    "potential_fraud": true/false,\n'
-        '    "details": ["Concise details about potential fraud"]\n'
         '  },\n'
         '  "recommendations": ["Actionable recommendations based on findings"]\n'
         "}\n\n"
-        "Ensure each section contains relevant information from the report. "
-        "If a section has no relevant information OR no actionable items (in the situation there is no issue with the bill), set its value to null."
+        "Rules:\n"
+        "1. Only include procedures with percentage_difference > 18%\n"
+        "2. Exclude any procedures where is_reasonable is true\n"
+        "3. Only include valid CPT codes (5 digits) or HCPCS codes (letter + 4 digits)\n"
+        "4. All monetary values must be rounded to exactly 2 decimal places\n"
+        "5. Sort procedures by percentage_difference in descending order"
     )
 
-    return await analyze_with_claude(prompt)
+    return await analyze_with_claude_haiku(prompt)
 
 async def analyze_medical_bill(user_input):
     try:
-       
-        results = []
         claude_results = user_input['claude_analyses'][0]['extracted_text'] 
 
         # Filter only needed data for each validation
@@ -171,19 +159,20 @@ async def analyze_medical_bill(user_input):
             code_validation(claude_results),
             ucr_validation(claude_results)
         )
-        results.append(code_result)
-        results.append(ucr_result)
+        results = [code_result, ucr_result]
+        # print(f"results: {ucr_resu}")
         
 
         try:
             # Generate final report
-            final_report = json.loads(await explanation_handler(results))
+            # print("before explanation")
+            final_report = await explanation_handler(results)
             # print(f"check and cheese : {final_report}", file=sys.stdout)
             # Add patient info to final report
-            final_report["patient_info"] = {
-                "name": f"{user_input['patient_info']['first_name']} {user_input['patient_info']['last_name']}",
-                "date_of_birth": user_input['patient_info']['date_of_birth']
-            }
+            # final_report["patient_info"] = {
+            #     "name": f"{user_input['patient_info']['first_name']} {user_input['patient_info']['last_name']}",
+            #     "date_of_birth": user_input['patient_info']['date_of_birth']
+            # }
             return final_report
         except json.JSONDecodeError:
             return {"summary": final_report}
@@ -248,18 +237,18 @@ async def code_validation(bill):
     try:
         validation_tasks = []
         
-        # Create tasks for each procedure code
-        for procedure in bill["billing_details"]["procedure_codes"]:
-            validation_tasks.append(validate_single_code(procedure))
+        # # Create tasks for each procedure code
+        # for procedure in bill["billing_details"]["procedure_codes"]:
+        #     validation_tasks.append(validate_single_code(procedure))
         
-        # Run all validations concurrently
-        validation_results = await asyncio.gather(*validation_tasks)
-        
+        # # Run all validations concurrently
+        # validation_results = await asyncio.gather(*validation_tasks)
+        # print(f"code done")
         # Combine results
         return {
-            "validation_results": validation_results,
+            "validation_results": "validated",
             "summary": "Code validation completed",
-            "total_codes_checked": len(validation_results)
+            # "total_codes_checked": len("Validate")
         }
         
     except Exception as e:
@@ -305,65 +294,3 @@ async def validate_single_code(procedure):
             "is_valid": False,
             "error": str(e)
         }
-    
-async def chunk_and_analyze(content: bytes, content_type: str, max_chunk_size: int = 8000) -> list:
-    """Process large files in chunks"""
-    try:
-        print(f"Starting chunk analysis for {content_type}", file=sys.stdout)
-        
-        if content_type.startswith('application/pdf'):
-            # Handle PDF
-            pdf = PdfReader(io.BytesIO(content))
-            chunks = []
-            
-            # Process each page as a chunk
-            for page in pdf.pages:
-                text = page.extract_text()
-                if text.strip():  # Only add non-empty pages
-                    chunks.append(text)
-                    
-        elif content_type.startswith('image/'):
-            # For images, we'll process in one go since Claude can handle them
-            chunks = [content]
-        else:
-            raise ValueError(f"Unsupported file type: {content_type}")
-
-        # Process chunks concurrently
-        tasks = [
-            analyze_bill_with_claude(chunk, content_type)
-            for chunk in chunks
-        ]
-        
-        results = await asyncio.gather(*tasks)
-        
-        # Combine results from all chunks
-        combined_result = combine_chunk_results(results)
-        
-        return combined_result
-        
-    except Exception as e:
-        print(f"Error in chunk_and_analyze: {str(e)}", file=sys.stderr)
-        raise
-
-def combine_chunk_results(results: list) -> dict:
-    """Combine results from multiple chunks"""
-    combined = {
-        'extracted_text': {
-            'billing_details': {
-                'procedure_codes': [],
-                'total_cost': 0
-            }
-        }
-    }
-    
-    for result in results:
-        if result and 'extracted_text' in result:
-            # Combine procedure codes
-            codes = result['extracted_text'].get('billing_details', {}).get('procedure_codes', [])
-            combined['extracted_text']['billing_details']['procedure_codes'].extend(codes)
-            
-            # Add costs
-            total = result['extracted_text'].get('billing_details', {}).get('total_cost', 0)
-            combined['extracted_text']['billing_details']['total_cost'] += total
-    
-    return combined

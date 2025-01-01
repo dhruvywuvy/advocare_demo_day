@@ -47,20 +47,39 @@ import { useAnalysis } from "../lib/context/AnalysisContext";
 //   }
 // };
 
+interface Procedure {
+  description: string;
+  billed_cost: number;
+  standardized_rate: number;
+  difference: number;
+  comments: string;
+}
+
 function Results() {
   const router = useRouter();
   const { analysisResult } = useAnalysis();
-  console.log("Raw analysis result:", analysisResult);
+  // console.log("Raw analysis result:", analysisResult);
 
   const formatCurrency = (value: number | null | undefined) => {
     if (value == null) return '-';
     return `$${value.toLocaleString()}`;
   };
-
+  // Debug the entire analysisResult first
+  console.log("Full analysisResult:", analysisResult);
+  
+  // Debug the path to procedures
+  console.log("UCR Validation:", analysisResult?.ucr_validation);
+  console.log("Procedure Analysis:", analysisResult?.ucr_validation?.procedure_analysis);
+  
   const procedures = analysisResult?.ucr_validation?.procedure_analysis || [];
+  console.log("Final procedures array:", procedures);
+
+  // const procedures = analysisResult?.ucr_validation?.procedure_analysis || [];
   const recommendations = analysisResult?.recommendations || [];
   const references = analysisResult?.ucr_validation?.references || [];
-  const summary = analysisResult?.summary || '';
+  // Debug logging
+  console.log("Procedures:", procedures);
+  // const summary = analysisResult?.summary || '';
 
   if (!analysisResult) {
     return (
@@ -106,14 +125,14 @@ function Results() {
                   </tr>
                 </thead>
                 <tbody>
-                  {procedures.map((procedure:string, index) => (
+                  {procedures.map((procedure: Procedure, index: number) => (
                     <tr key={index} className="hover:bg-gray-50">
                       <td className="px-4 py-2 border">{index + 1}</td>
-                      <td className="px-4 py-2 border">{procedure?.description || '-'}</td>
-                      <td className="px-4 py-2 border text-right">{formatCurrency(procedure?.billed_cost)}</td>
-                      <td className="px-4 py-2 border text-right">{formatCurrency(procedure?.ucr_rate)}</td>
-                      <td className="px-4 py-2 border text-right">{formatCurrency(procedure?.difference)}</td>
-                      <td className="px-4 py-2 border">{procedure?.comments || '-'}</td>
+                      <td className="px-4 py-2 border">{procedure.description || '-'}</td>
+                      <td className="px-4 py-2 border text-right">{formatCurrency(procedure.billed_cost)}</td>
+                      <td className="px-4 py-2 border text-right">{formatCurrency(procedure.standardized_rate)}</td>
+                      <td className="px-4 py-2 border text-right">{formatCurrency(procedure.difference)}</td>
+                      <td className="px-4 py-2 border">{procedure.comments || '-'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -124,7 +143,7 @@ function Results() {
               <div className="mt-4">
                 <h4 className="font-medium mb-2">Recommendations</h4>
                 <ul className="list-disc pl-5">
-                  {recommendations.map((recommendation:string, index) => (
+                  {recommendations.map((recommendation:string, index: string) => (
                     <li key={index} className="mb-1">{recommendation}</li>
                   ))}
                 </ul>
@@ -135,7 +154,7 @@ function Results() {
               <div className="mt-4">
                 <h4 className="font-medium mb-2">References</h4>
                 <ul className="list-disc pl-5">
-                  {references.map((reference, index) => (
+                  {references.map((reference: string, index: string) => (
                     <li key={index} className="mb-1">{reference}</li>
                   ))}
                 </ul>

@@ -8,17 +8,13 @@ from datetime import date
 import os
 from dotenv import load_dotenv
 from app.services.bill_analyzer import analyze_medical_bill
-from app.services.claude import analyze_bill_with_claude
 from app.services.ocr import extract_text_from_document
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-# from app.services.claude import analyze_with_claude
-# from app.services.perplexity import search_ucr_rates
-# Load environment variables
+import time
 load_dotenv()
 
-app = FastAPI(title="Medical Bill Analyzer API") #different
-MAX_CONTENT_SIZE = 1024 * 1024  # 1MB limit for text files
+app = FastAPI(title="Medical Bill Analyzer API")
 
 # Configure CORS
 app.add_middleware(
@@ -29,7 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class AnalysisRequest(BaseModel): #entire class doesn't exist different
+class AnalysisRequest(BaseModel): #entire class doesn't exist 
     first_name: str
     last_name: str
     date_of_birth: date
@@ -45,7 +41,7 @@ async def analyze_bill(
 
     try:
         print(f"Processing request for {firstName} {lastName}", file=sys.stdout)
-        
+        start_time = time.time()
         # Get Claude's analysis first
         claude_results = []
         for file in files:
@@ -56,18 +52,16 @@ async def analyze_bill(
             # OCR time
             claude_analysis = await extract_text_from_document(content, file.content_type)
             claude_results.append(claude_analysis)
-        
+            # print(f"Time taken: {end_time - start_time} seconds")
+            
         # Pass Claude's results to analyze_medical_bill for additional processing
         print(f"Claude's results: {claude_results}")
         analysis_result = await analyze_medical_bill({
-            "patient_info": {
-                "first_name": firstName,
-                "last_name": lastName,
-                "date_of_birth": dateOfBirth
-            },
             "claude_analyses": claude_results
         })
-        
+        print(f"Analysis result: {analysis_result}")
+        end_time = time.time()
+        print(f"Time taken: {end_time - start_time} seconds")
         return {"analysis": analysis_result}
 
     except Exception as e:
