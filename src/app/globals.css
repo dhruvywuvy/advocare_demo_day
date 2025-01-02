@@ -20,6 +20,7 @@ body {
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
 /* Global styles */
 
@@ -34,12 +35,14 @@ body {
 
 /* Header styles */
 header {
-  background-color: #ffffff;
+  background-color: #F8F8F8;
+  font-family: Arial, Helvetica, sans-serif;
   padding: 0rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  
 }
 
 header a h1 {
@@ -246,4 +249,13 @@ button.cta:hover {
 
 .dark-green-text {
   color: #2a555e;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in;
 }

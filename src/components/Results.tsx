@@ -83,7 +83,7 @@ function Results() {
 
   if (!analysisResult) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-teal-50 to-white">
+      <div className="flex flex-col items-center justify-center h-screen ">
         <p className="text-xl mb-4">No analysis results available.</p>
         <button
           onClick={() => router.push("/")}
@@ -96,16 +96,16 @@ function Results() {
   }
 
   return (
-    <div className="bg-gradient-to-b from-teal-50 to-white py-6 flex justify-center">
+    <div className="bg-white flex justify-center">
       <div className="max-w-4xl w-full px-4">
-        <div className="bg-white p-6 rounded shadow-md">
+        <div className="bg-white-[#F8F8F8] p-6 border-teal-400 border rounded-xl shadow-lg shadow-teal-90 ">
           <h2 className="text-2xl font-bold mb-4">Analysis Result</h2>
 
           {/* Summary Section */}
           <section className="mb-4">
             <h3 className="text-xl font-semibold mb-2">Summary</h3>
-            <div className="bg-gray-100 p-4 rounded">
-              <p>{analysisResult?.summary}</p>
+            <div className="border border-teal-500 p-2 rounded-xl">
+              <p className="text-lg text-teal-600">{analysisResult?.summary}</p>
             </div>
           </section>
 
@@ -152,7 +152,7 @@ function Results() {
 
             {references.length > 0 && (
               <div className="mt-4">
-                <h4 className="font-medium mb-2">References</h4>
+                <h4 className="font-medium mb-2">Sources Used:</h4>
                 <ul className="list-disc pl-5">
                   {references.map((reference: string, index: string) => (
                     <li key={index} className="mb-1">{reference}</li>

@@ -174,15 +174,15 @@ export default function UploadInfo() {
   };
 
   return (
-    <div className="min-h-screen bg-white py-12 relative" style={{ background: 'linear-gradient(to bottom, #e0f7f4, #ffffff)' }}>
+    <div className="min-h-screen bg-white py-12 relative" >
       {!loading ? (
         <div className="container mx-auto px-4">
-          <Card className="max-w-2xl mx-auto bg-white shadow-lg">
+          <Card className="max-w-2xl mx-auto bg-[#FFFFFF] shadow-xl rounded-2xl border shadow-teal-50 border-teal-400">
             <CardHeader>
-              <CardTitle className="text-3xl font-bold text-center text-[#008080]">Get Started with Advocare</CardTitle>
+              <CardTitle className="text-3xl font-bold text-center text-[#008080]">Upload Your Medical Bill</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6 border-2 border-teal" >
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="first-name" className="text-[#008080] font-bold">First Name</Label>
@@ -232,7 +232,7 @@ export default function UploadInfo() {
                     name="medicalBill"
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
-                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#e0f7f4] file:text-[#008080] hover:file:bg-[#c5f0ea] border-[#ddd] focus:border-[#28a29e] focus:ring-[#28a29e]"
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#e0f7f4] file:text-[#008080] hover:file:bg-[#c5f0ea] border-[#ddd] focus:border-[#28a29e] focus:ring-[#28a29e] py-1.5 h-[48px]"
                     required
                   />
                   <p className="text-sm text-gray-500">Accepted formats: PDF, JPG, PNG</p>

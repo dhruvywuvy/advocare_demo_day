@@ -8,15 +8,17 @@ function Index() {
 
   return (
     <>
-      <div id="start-container" className="pt-52 pl-8 md:pl-16 *">
+      <div id="start-container" className="pt-20 pl-8 md:pl-16">
         <div id="start-screen-txt">
           <h1 className="text-5xl font-bold mb-4 text-black text-left ">
             Stop overpaying<br />
             on medical bills.
           </h1>
           <p className="text-base mb-6 font-thin text-black">
-            Let us uncover billing errors and negotiate savings on your behalf.
-            Save money and fight unfair charges today.
+          We uncover billing errors and negotiate savings for you.
+          Start saving and fighting unfair charges today!
+            {/* Let us uncover billing errors and negotiate savings on your behalf.
+            Save money and fight unfair charges today. */}
           </p>
           <div className="button-group">
             <button
@@ -37,7 +39,7 @@ function Index() {
       </div>
 
       {/* Added Features Section */}
-      <div className="features-section">
+      <div className="features-section  border-200 border shadow-2xl">
         <div className="features-grid">
           <div className="feature-card">
             <div className="feature-icon shield"></div>

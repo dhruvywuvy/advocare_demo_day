@@ -16,7 +16,7 @@ export const Sidebar = () => {
 
   return (
     <div className="w-64 bg-white border-r min-h-screen p-4">
-      {/* Logo */}
+      {/* Logo */} bil
       {/* <div className="mb-8">
         <Link href="/" className="flex items-center">
           <span className="text-teal-600 text-xl font-semibold">advocare</span>

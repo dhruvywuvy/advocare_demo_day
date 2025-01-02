@@ -44,26 +44,39 @@ function WaitlistForm() {
     }
   };
   return (
-    <div>
-      <h2 className="pt-64 text-3xl m-7 text-center">Join our Waitlist</h2>
-      <div className="flex justify-center items-center">
-        <form onSubmit={handleSubmit} className="flex flex-col items-center">
-          <input
-            className=" mb-7 border-solid border-2 p-[0.5rem]"
-            name="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            required
-          />
-          <button type="submit" className="cta black-bg white-text">
-            Submit
-          </button>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-        </form>
+    <main className="container mx-auto px-4 py-16">
+      <div className="max-w-2xl mx-auto ">
+        <div className="mb-8">
+          <h2 className="text-3xl font-semibold text-center text-[#008080]">
+            Join our Waitlist
+          </h2>
+        </div>
+        
+        <div className="space-y-8 border border-teal-400 rounded-xl " >
+          <form onSubmit={handleSubmit} className="bg-white space-y-6 rounded-xl border border-white-1 shadow-lg ">
+            <div className="space-y-2">
+              <input
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full p-3 bg-white-50 border border-teal-500 rounded-xl rounded-lg focus:border-[#008080] focus:ring-[#008080] outline-none
+                  text-[#008080] placeholder-[#008080]"
+                required
+              />
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+            </div>
+            <button 
+              type="submit" 
+              className="w-full bg-[#008080] hover:bg-[#006666] rounded-xl  text-white font-medium py-2.5 transition-colors"
+            >
+              Join Waitlist
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
 export default WaitlistForm;
