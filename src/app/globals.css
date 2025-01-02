@@ -9,6 +9,7 @@
 
 main {
   padding-top: 3.5rem; /* Matches navbar height of h-14 (56px) */
+
 }
 
 
@@ -149,7 +150,7 @@ a.cta, .cta, .waitlist-button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+ padding: 2rem;
   min-height: 90vh;
   background: linear-gradient(to bottom, #e0f7f4, #ffffff);
 }
@@ -159,8 +160,8 @@ form {
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  max-width: 300px;
   width: 100%;
+  justify-content: center;
 }
 
 .customer-info-input-box {

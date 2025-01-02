@@ -24,11 +24,11 @@ const AdvocateCards = () => {
   const advocates: Advocate[] = [
     {
       id: 1,
-      name: "Io Dolka",
+      name: "Kimberly Acosta",
       title: "RN",
       rating: 4.5,
       image: "/profile_pictures/iodolka.jpg",
-      experience: "10 years of experience in pediatric nursing at Mayo Clinic",
+      experience: "Practicing as a healthcare advocate since 2020; serving all of Southern California",
       details: [
         "Specializes in medical bill review and negotiation",
         "Successfully reduced bills by an average of 40% for clients",
@@ -40,7 +40,7 @@ const AdvocateCards = () => {
     },
     {
       id: 2,
-      name: "Cindy Johnson",
+      name: "Carol Hirsch",
       title: "MSN",
       rating: 5.0,
       image: "/profile_pictures/cindyjohnson.jpg",

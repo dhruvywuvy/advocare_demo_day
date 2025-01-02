@@ -17,11 +17,11 @@ export const Sidebar = () => {
   return (
     <div className="w-64 bg-white border-r min-h-screen p-4">
       {/* Logo */}
-      <div className="mb-8">
+      {/* <div className="mb-8">
         <Link href="/" className="flex items-center">
           <span className="text-teal-600 text-xl font-semibold">advocare</span>
         </Link>
-      </div>
+      </div> */}
 
       {/* Navigation Links */}
       <nav className="space-y-2">

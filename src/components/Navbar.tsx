@@ -32,13 +32,14 @@ function Navbar() {
       <nav className="flex w-full flex-row justify-end items-center">
         {/* <a href="/" className="dark-green-text">Home</a>
         <a href="/support" className="dark-green-text">Support</a> */}
-        <Link href="/about">About Us</Link>
-        <Link href="/dashboard">Dashboard</Link>
+        <Link href="/about">About</Link>
+        <Link href="/waitlist">Contact</Link>
+        {/*<Link href="/dashboard">Dashboard</Link>
         {user ? (
           <button onClick={handleLogout}>Logout</button>
         ) : (
           <Link href="/login">Login</Link>
-        )}
+        )}*/}
       </nav>
     </header>
   );

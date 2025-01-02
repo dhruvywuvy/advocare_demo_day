@@ -8,9 +8,9 @@ function Index() {
 
   return (
     <>
-      <div id="start-container" className="pt-52 pl-8 md:pl-16">
+      <div id="start-container" className="pt-52 pl-8 md:pl-16 *">
         <div id="start-screen-txt">
-          <h1 className="text-5xl font-bold mb-4 text-black text-left">
+          <h1 className="text-5xl font-bold mb-4 text-black text-left ">
             Stop overpaying<br />
             on medical bills.
           </h1>
@@ -25,6 +25,7 @@ function Index() {
             >
               Get Started
             </button>
+             
             <button
               className="waitlist-button"
               onClick={() => router.push("/waitlist")}

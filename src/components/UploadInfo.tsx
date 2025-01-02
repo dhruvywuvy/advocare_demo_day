@@ -1,9 +1,22 @@
 'use client';
+import './UploadInfo.css';
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAnalysis } from "../lib/context/AnalysisContext";
 import "./UploadInfo.css"
-
+import { Button } from '@/src/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card'
+import { Input } from '@/src/components/ui/input'
+import { Label } from '@/src/components/ui/label'
+import { CustomSelect } from '@/src/components/ui/custom-select'
+import type { InsuranceProvider } from '@/src/types'
+const insuranceProviders: { value: InsuranceProvider; label: string }[] = [
+  { value: 'Cigna', label: 'Cigna' },
+  { value: 'Aetna', label: 'Aetna' },
+  { value: 'Blue Cross', label: 'Blue Cross' },
+  { value: 'UnitedHealth', label: 'UnitedHealth' },
+  { value: 'Other', label: 'Other' }
+]
 // Demo data that matches the results page
 const DEMO_RESULT = {
   analysis: {
@@ -161,8 +174,86 @@ export default function UploadInfo() {
   };
 
   return (
+    <div className="min-h-screen bg-white py-12 relative" style={{ background: 'linear-gradient(to bottom, #e0f7f4, #ffffff)' }}>
+      {!loading ? (
+        <div className="container mx-auto px-4">
+          <Card className="max-w-2xl mx-auto bg-white shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-3xl font-bold text-center text-[#008080]">Get Started with Advocare</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="first-name" className="text-[#008080] font-bold">First Name</Label>
+                    <Input id="first-name" name="first-name" required className="border-[#ddd] focus:border-[#28a29e] focus:ring-[#28a29e]" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="last-name" className="text-[#008080] font-bold">Last Name</Label>
+                    <Input id="last-name" name="last-name" required className="border-[#ddd] focus:border-[#28a29e] focus:ring-[#28a29e]" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-[#008080] font-bold">Email</Label>
+                    <Input id="email" name="email" type="email" required className="border-[#ddd] focus:border-[#28a29e] focus:ring-[#28a29e]" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="date-of-birth" className="text-[#008080] font-bold">Date of Birth</Label>
+                    <Input 
+                      id="date-of-birth" 
+                      name="date-of-birth" 
+                      type="date" 
+                      required 
+                      className="border-[#ddd] focus:border-[#28a29e] focus:ring-[#28a29e]" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city" className="text-[#008080] font-bold">City</Label>
+                    <Input id="city" name="city" required className="border-[#ddd] focus:border-[#28a29e] focus:ring-[#28a29e]" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="state" className="text-[#008080] font-bold">State</Label>
+                    <Input id="state" name="state" required className="border-[#ddd] focus:border-[#28a29e] focus:ring-[#28a29e]" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <CustomSelect
+                      id="insurance"
+                      name="insurance"
+                      options={insuranceProviders}
+                      label="Insurance Provider"
+                      required
+                    />
+                  </div>
+                </div>
 
-    <div className="pt-32 flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-white py-8">
+                <div className="space-y-2">
+                  <Label htmlFor="bill-input" className="text-[#008080] font-bold">Upload Medical Bill</Label>
+                  <Input
+                    id="bill-input"
+                    name="medicalBill"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#e0f7f4] file:text-[#008080] hover:file:bg-[#c5f0ea] border-[#ddd] focus:border-[#28a29e] focus:ring-[#28a29e]"
+                    required
+                  />
+                  <p className="text-sm text-gray-500">Accepted formats: PDF, JPG, PNG</p>
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-[#28a29e] hover:bg-[#1d7d7a] text-white font-bold py-3 px-4 rounded-full transition duration-300 ease-in-out"
+                >
+                  Submit
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <img id="loading-anim" src="loading.svg" alt="Loading" className="w-64 h-64" />
+        </div>
+      )}
+    </div>
+  /* <div className="pt-32 flex flex-col items-center min-h-screen bg-gradient-to-b from-teal-50 to-white py-8">
       <div id="form-container">
         <h1 className="text-4xl font-bold mb-6 text-center">
           Tell us about your case!
@@ -308,6 +399,7 @@ export default function UploadInfo() {
         </form>
       </div>
       <img id="loading-anim" className={`absolute m-[auto] ${loading ? "" : "form-hide"}`} src="loading.svg" />
-    </div>
+    </div> 
+    */
   );
 }

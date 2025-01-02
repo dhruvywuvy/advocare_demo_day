@@ -121,7 +121,7 @@ function Results() {
                     <th className="px-4 py-2 border">Billed Cost</th>
                     <th className="px-4 py-2 border">Standard Rate</th>
                     <th className="px-4 py-2 border">Difference</th>
-                    <th className="px-4 py-2 border">Comments</th>
+                    {/* <th className="px-4 py-2 border">Comments</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -132,7 +132,7 @@ function Results() {
                       <td className="px-4 py-2 border text-right">{formatCurrency(procedure.billed_cost)}</td>
                       <td className="px-4 py-2 border text-right">{formatCurrency(procedure.standardized_rate)}</td>
                       <td className="px-4 py-2 border text-right">{formatCurrency(procedure.difference)}</td>
-                      <td className="px-4 py-2 border">{procedure.comments || '-'}</td>
+                      {/* <td className="px-4 py-2 border">{procedure.comments || '-'}</td> */}
                     </tr>
                   ))}
                 </tbody>
