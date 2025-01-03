@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { Configuration, OpenAIApi } from 'openai';
 import { AnthropicClient } from '@anthropic';
-import { GoogleCloudVisionClient } from '@google-cloud/vision';
+//import { GoogleCloudVisionClient } from '@google-cloud/vision';
 
 // Types
 interface ProcedureCode {
