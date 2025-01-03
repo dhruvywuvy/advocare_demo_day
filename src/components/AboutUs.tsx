@@ -58,7 +58,7 @@ export default function AboutUs() {
             <div className="space-y-4 md:space-y-6">
               <h2 className="text-2xl md:text-3xl font-bold text-[#008080]">Our Mission</h2>
               <p className="text-gray-600 text-base md:text-lg">
-                As students, we've witnessed firsthand the devastating impact of overcharged medical bills on everyday people. That's why we started Advocare – to ensure no one has to choose between their health and their financial stability.
+                As students, we've witnessed firsthand the devastating impact of overcharged medical bills on everyday people. That's why we started MediChecker– to ensure no one has to choose between their health and their financial stability.
               </p>
               <p className="text-gray-600 text-base md:text-lg">
                 We combine expert healthcare advocates with cutting-edge technology to identify billing errors, negotiate costs, and fight for fair pricing. Our mission is simple: to make healthcare truly affordable for everyone.
