@@ -33,7 +33,7 @@ const perplexityClient = new OpenAIApi(new Configuration({
 }));
 
 const anthropicClient = new AnthropicClient(process.env.ANTHROPIC_API_KEY);
-const visionClient = new GoogleCloudVisionClient();
+//const visionClient = new GoogleCloudVisionClient();
 
 // Utility functions
 const loadCptDatabase = async () => {
