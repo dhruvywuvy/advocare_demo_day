@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 
 const messages = [
   "This will take roughly 20 seconds",
+  "We refer you to advocates",
   "Advocates are expert negotiators in the healthcare industry",
   "80% of medical bills contain errors (according to NBC)",
-  "Did you know you could negotiate your medical bill?"
+  "Did you know you could negotiate your medical bill?",
+  "Advocates bring down bills by 30% on average",
 ];
 
 export function LoadingMessages() {
@@ -16,7 +18,7 @@ export function LoadingMessages() {
       setCurrentMessageIndex((prevIndex) => 
         prevIndex === messages.length - 1 ? 0 : prevIndex + 1
       );
-    }, 3000); // Changes message every 3 seconds
+    }, 5000); // Changes message every 3 seconds
 
     return () => clearInterval(interval);
   }, []);

@@ -70,6 +70,7 @@ export default function UploadInfo() {
   const [insuranceChecked, setInsuranceChecked] = useState(false);
   const [formSwitch, switchForm] = useState(false);
   const [email, setEmail] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     let container = document.getElementById("form-container");
@@ -137,69 +138,82 @@ export default function UploadInfo() {
         method: "POST",
         body: formData,
       });
-    console.log("Response status:", response.status);
 
-    if (!response.ok){
-      const errorData = await response.text();
-      console.error("API Error:", errorData);
-      throw new Error ("Failed to analyze bill");
-    }
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
 
-    const result = await response.json();
-    console.log("API Response:", result); // Debug log
-
-    if (!result.analysis) {
-      throw new Error("Invalid response format - missing analysis data");
-    }
-    setAnalysisResult(result.analysis);
-    console.log("Analysis set, navigating to results..."); // Debug log
-    router.push("/results");
-
-    // Store analysis results in temp_analysis_results
-    const { error: insertError } = await supabase
-      .from('temp_analysis_results')
-      .insert([
-        {
-          analysis_result: result.analysis,
-        }
-      ]);
-    if (insertError) {
-      console.error("Error inserting analysis result:", insertError);
-    }
-
-    // Insert email into waitlist
-    const { data, error } = await supabase.from("waitlist").insert([
-      {
-        email,
-        created_at: new Date().toISOString(),
-      },
-    ]);
-    if (error) {
-      console.error("Error inserting data:", error);
-    } else {
-      console.log("Data inserted successfully:", data);
-    }
-  }catch (error) {
-    console.error("Error:", error);
-    setError("Something went wrong. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-  
-
-    // try {
-    //   // Simulate API delay
-    //   await new Promise(resolve => setTimeout(resolve, 2000));
+      // Add detailed logging
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
       
-    //   // Set demo result and redirect
-    //   setAnalysisResult(DEMO_RESULT);
-    //   router.push("/results");
-    // } catch (error) {
-    //   console.error("Error:", error);
-    //   setError("Something went wrong. Please try again.");
-    // } finally {
-    //   setLoading(false);
-    // }
+      let result;
+      try {
+        result = JSON.parse(responseText);
+        console.log("Parsed result:", result);
+        console.log("Result type:", typeof result);
+      } catch (parseError) {
+        console.error("JSON parse error:", parseError);
+        throw new Error("Failed to parse API response");
+      }
+
+      if (!result || typeof result !== 'object') {
+        console.error("Invalid result format:", result);
+        throw new Error("API response is not an object");
+      }
+
+      if (!result.analysis) {
+        console.error("Missing analysis in result:", result);
+        throw new Error("Invalid response format - missing analysis data");
+      }
+
+      setAnalysisResult(result.analysis);
+      console.log("Analysis set, navigating to results...");
+      router.push("/results");
+
+      // Store analysis results in temp_analysis_results
+      const { error: insertError } = await supabase
+        .from('temp_analysis_results')
+        .insert([
+          {
+            analysis_result: result.analysis,
+          }
+        ]);
+      if (insertError) {
+        console.error("Error inserting analysis result:", insertError);
+      }
+
+      // Insert email into waitlist
+      const { data, error } = await supabase.from("waitlist").insert([
+        {
+          email,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+      if (error) {
+        console.error("Error inserting data:", error);
+      } else {
+        console.log("Data inserted successfully:", data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+      
+      // Log file information
+      console.log('File type:', selectedFile.type);
+      console.log('File name:', selectedFile.name);
+      console.log('File size:', selectedFile.size, 'bytes');
+      console.log('Full file object:', selectedFile);
+    }
   };
 
   return (
@@ -270,6 +284,7 @@ export default function UploadInfo() {
                     accept=".pdf,.jpg,.jpeg,.png"
                     className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#e0f7f4] file:text-[#008080] hover:file:bg-[#c5f0ea] border-[#ddd] focus:border-[#28a29e] focus:ring-[#28a29e] py-1.5 h-[48px]"
                     required
+                    onChange={handleFileChange}
                   />
                   <p className="text-sm text-gray-500">Accepted formats: PDF, JPG, PNG</p>
                 </div>
