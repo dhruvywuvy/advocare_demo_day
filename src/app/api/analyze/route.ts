@@ -12,12 +12,12 @@ const AnalysisSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const validatedData = AnalysisSchema.parse({
+    /*const validatedData = AnalysisSchema.parse({
       firstName: formData.get('firstName'),
       lastName: formData.get('lastName'),
       dateOfBirth: formData.get('dateOfBirth'),
       files: formData.getAll('files')
-    });
+    });*/
 
     // Forward the request to FastAPI backend
     const response = await fetch('http://localhost:8000/api/analyze', {
