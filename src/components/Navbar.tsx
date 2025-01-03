@@ -26,7 +26,7 @@ function Navbar() {
           src="/logo.png"  // Path relative to public directory
           alt="Advocare Logo"
           width={200}     // Adjust size as needed
-          height={40}     // Adjust size as needed
+          height={60}     // Adjust size as needed
           className="ml-4"  // Add margin if needed
         /></Link>
       <nav className="flex w-full flex-row justify-end items-center">
