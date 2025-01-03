@@ -1,8 +1,8 @@
 // app/api/analyze/route.ts
 import { NextResponse } from 'next/server';
 import { Configuration, OpenAIApi } from 'openai';
-import { AnthropicClient } from '@anthropic';
-import {anthropic} from '@ai-sdk/anthropic';
+import  AnthropicClient from '@anthropic-ai/sdk'
+import Anthropic from '@ai-sdk/anthropic';
 //import { GoogleCloudVisionClient } from '@google-cloud/vision';
 
 // Types
