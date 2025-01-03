@@ -14,6 +14,7 @@ from PIL import Image
 import cv2
 import numpy as np
 from io import BytesIO
+from pdf2image import convert_from_bytes
 
 
 
@@ -28,13 +29,30 @@ async def extract_text_from_document(file_content: bytes, file_type: str, max_re
     start_time = time.time()
     
     if file_type == "application/pdf":
-        # Handle multi-page PDFs
-        pdf = PdfReader(io.BytesIO(file_content))
-        # Convert first page to image or use directly if Claude supports PDF
-        file_content = pdf.pages[0].extract_bytes()  # Or implement PDF->image conversion
-    if file_type.startswith('image/'):
+        try:
+            # Convert PDF to image
+            images = convert_from_bytes(file_content)
+            if not images:
+                raise Exception("Could not convert PDF to image")
+                
+            # Just use the first page
+            first_page = images[0]
+            
+            # Convert to PNG bytes
+            img_byte_arr = io.BytesIO()
+            first_page.save(img_byte_arr, format='PNG')
+            file_content = img_byte_arr.getvalue()
+            
+            # Set correct media type for Claude
+            media_type = "image/png"
+        except Exception as e:
+            print(f"PDF conversion error: {str(e)}")
+            raise
+    elif file_type.startswith('image/'):
         file_content = await preprocess_image(file_content)
         file_type = 'image/png'  # Use PNG for processed images
+            
+        
     
     for attempt in range(max_retries):
         try:
@@ -51,7 +69,7 @@ async def extract_text_from_document(file_content: bytes, file_type: str, max_re
                             "type": "image",
                             "source": {
                                 "type": "base64",
-                                "media_type": file_type,
+                                "media_type": media_type,
                                 "data": encoded_content
                             }
                         },
@@ -126,7 +144,7 @@ async def extract_text_from_document(file_content: bytes, file_type: str, max_re
                     return {
                         "success": True,
                         "extracted_text": parsed_json,
-                        "file_type": file_type
+                        "file_type": media_type
                     }
                 else:
                     print(f"Attempt {attempt + 1}: No procedure codes found, retrying...")
@@ -150,7 +168,7 @@ async def extract_text_from_document(file_content: bytes, file_type: str, max_re
     return {
         "success": False,
         "error": "Failed to extract text after multiple attempts",
-        "file_type": file_type
+        "file_type": media_type
     }
 
 async def preprocess_image(file_content: bytes) -> bytes:

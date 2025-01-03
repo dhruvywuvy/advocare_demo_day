@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 // import { BeatLoader } from 'react-spinners';
 import { useAnalysis } from "../lib/context/AnalysisContext"; 
 // import { useContext } from "react";  // Add this import
+import { LoadingMessages } from './LoadingMessages';  // Add this import
 
 // // Demo data stays the same...
 // const DEMO_DATA = {
