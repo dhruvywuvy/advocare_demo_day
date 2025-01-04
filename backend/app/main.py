@@ -35,7 +35,7 @@ async def root():
     return {"message": "Advocare API is running"}
 
 # Receive info from ffrontend
-@app.post("/analyze")
+@app.post("/api/analyze")
 async def analyze_bill(
     files: List[UploadFile] = File(...),
     firstName: str = Form(...),
@@ -82,4 +82,4 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=10000)
