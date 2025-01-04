@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 import json
 import io
-from PyPDF2 import PdfReader
+#from PyPDF2 import PdfReader
 import asyncio
 import re
 import time
