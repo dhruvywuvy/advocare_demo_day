@@ -30,6 +30,10 @@ class AnalysisRequest(BaseModel): #entire class doesn't exist
     last_name: str
     date_of_birth: date
 
+@app.get("/")
+async def root():
+    return {"message": "Advocare API is running"}
+
 # Receive info from ffrontend
 @app.post("/api/analyze")
 async def analyze_bill(
