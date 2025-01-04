@@ -1,28 +1,34 @@
-annotated-types==0.7.0
-anthropic==0.39.0
-anyio==4.6.2.post1
-appdirs==1.4.4
-asgiref==3.7.2
-atomicwrites==1.4.0
-certifi==2024.8.30
-click==8.1.7
-distro==1.9.0
-exceptiongroup==1.2.2
+# API and Web Framework
 fastapi==0.115.5
-h11==0.14.0
-httpcore==1.0.7
-httpx==0.27.2
-idna==3.10
-openai==1.54.4
-pydantic==2.9.2
-pydantic-core==2.23.4
-python-dotenv==1.0.1
-python-multipart==0.0.17
-sniffio==1.3.1
-supabase==2.11.0
-starlette==0.41.3
-tqdm==4.67.0
-typing-extensions==4.12.2
 uvicorn==0.32.0
-redis>=4.5.0
+python-multipart==0.0.17
+starlette==0.41.3
+
+# AI and ML
+anthropic==0.39.0
+openai==1.54.4
 tiktoken==0.8.0
+
+# Image Processing
+Pillow==10.2.0
+opencv-python-headless==4.9.0.80
+numpy==1.26.3
+pdf2image==1.17.0
+poppler-utils==0.1.0
+
+# Database and Caching
+supabase==2.11.0
+redis>=4.5.0
+
+# HTTP and Networking
+httpx==0.27.2
+aiohttp==3.9.1
+requests==2.31.0
+
+# Utilities
+python-dotenv==1.0.1
+pydantic==2.9.2
+annotated-types==0.7.0
+typing-extensions==4.12.2
+DateTime==5.4
+pathlib==1.0.1
