@@ -35,7 +35,7 @@ async def root():
     return {"message": "Advocare API is running"}
 
 # Receive info from ffrontend
-@app.post("/api/analyze")
+@app.post("/analyze")
 async def analyze_bill(
     files: List[UploadFile] = File(...),
     firstName: str = Form(...),
