@@ -13,8 +13,7 @@ tiktoken==0.8.0
 Pillow==10.2.0
 opencv-python-headless==4.9.0.80
 numpy==1.26.3
-pdf2image==1.17.0
-poppler-utils==0.1.0
+PyMuPDF==1.23.8
 
 # Database and Caching
 supabase==2.11.0
@@ -22,13 +21,13 @@ redis>=4.5.0
 
 # HTTP and Networking
 httpx==0.27.2
-aiohttp==3.9.1
+aiohttp>=3.11.11  # Changed to match supabase's requirement
 requests==2.31.0
 
 # Utilities
 python-dotenv==1.0.1
 pydantic==2.9.2
-annotated-types==0.7.0
 typing-extensions==4.12.2
-DateTime==5.4
-pathlib==1.0.1
+
+# Remove unnecessary packages
+# DateTime and pathlib are built into Python 3
