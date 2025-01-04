@@ -143,6 +143,7 @@ export default function UploadInfo() {
         throw new Error(`API error: ${response.statusText}`);
       }
 
+      console.log("response:", response);
       // Add detailed logging
       const responseText = await response.text();
       console.log("Raw response:", responseText);

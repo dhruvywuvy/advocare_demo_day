@@ -24,18 +24,18 @@ export async function POST(request: NextRequest) {
     //   method: 'POST',
     //   body: formData
     // });
-    console.log("YSYAYAYAYY", `${process.env.NEXT_PUBLIC_API_URL}`);
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}`, {
+    console.log("YSYAYAYAYY", `${process.env.NEXT_PUBLIC_API_URL}/api/analyze`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/analyze`, {
       method: "POST",
       body: formData,
     });
 
     if (!response.ok) {
       console.log("not ok :(");
-      console.log(response);
       const error = await response.json();
       return NextResponse.json({ error: error.detail }, { status: response.status });
     }
+    console.log(response);
 
     const data = await response.json();
     return NextResponse.json(data);
